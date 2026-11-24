@@ -1,4 +1,20 @@
-# みらい議会
+# みらい議会＠東広島市
+
+> [!IMPORTANT]
+> **これは政党チームみらいが運営しているものではありません。**
+> 「みらい議会＠東広島市」は、[team-mirai/mirai-gikai](https://github.com/team-mirai/mirai-gikai) をフォークして改修した、非公式の個人運営サービスです（フォーク改修日: 2026-11-24、AGPL-3.0 第5条(a) に基づく変更の明示）。
+>
+> - フォーク版ソースコード（本リポジトリ）: https://github.com/kanshakangekiamearashi-cloud/mirai-gikai
+> - 本家「みらい議会」: https://gikai.team-mir.ai/
+> - フォーク元リポジトリ: https://github.com/team-mirai/mirai-gikai
+> - データ出典: [東広島市議会公式サイト](https://www.city.higashihiroshima.lg.jp/shgikai/)
+> - 改修内容（名称・カラー・ロゴ・免責表示・リンク先の変更、東広島市議会データの収録方針）: [HIGASHIHIROSHIMA.md](./HIGASHIHIROSHIMA.md) を参照
+> - ライセンスは上流と同じ AGPL-3.0 を継承します
+
+---
+以下はフォーク元の README です。
+
+# みらい議会（フォーク元）
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/team-mirai-volunteer/mirai-gikai)
 [![codecov](https://codecov.io/gh/team-mirai/mirai-gikai/branch/develop/graph/badge.svg)](https://codecov.io/gh/team-mirai/mirai-gikai)

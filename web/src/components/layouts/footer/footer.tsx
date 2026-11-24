@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isInterviewPage } from "@/lib/page-layout-utils";
 import { routes } from "@/lib/routes";
+import { EXTERNAL_LINKS } from "@/config/external-links";
 import { policyLinks, primaryLinks } from "./footer.config";
 
 export function Footer() {
@@ -21,6 +22,7 @@ export function Footer() {
         <FooterLogoSection />
         <FooterPrimaryLinks />
         <FooterPolicies />
+        <FooterDisclaimer />
         <FooterCopyright />
       </div>
     </footer>
@@ -30,10 +32,10 @@ export function Footer() {
 function FooterLogoSection() {
   return (
     <div className="flex flex-col items-center text-center mb-9">
-      <Link href={routes.home()} aria-label="みらい議会 トップページ">
+      <Link href={routes.home()} aria-label="みらい議会＠東広島市 トップページ">
         <Image
           src="/img/logo.svg"
-          alt="みらい議会"
+          alt="みらい議会＠東広島市"
           width={150}
           height={128}
           className="h-auto"
@@ -91,10 +93,45 @@ function FooterPolicies() {
   );
 }
 
+function FooterDisclaimer() {
+  return (
+    <div className="mb-5 max-w-[420px] text-center text-[12px] leading-relaxed text-slate-700">
+      <p className="font-semibold">
+        これは政党チームみらいが運営しているものではありません
+      </p>
+      <p className="mt-2">
+        「みらい議会＠東広島市」は、本家「みらい議会」（チームみらい）の
+        オープンソースをフォークした、非公式の個人運営サービスです。
+        掲載内容は東広島市議会の公式資料に基づきます。
+      </p>
+      <p className="mt-2">
+        ソースコード:{" "}
+        <a
+          href={EXTERNAL_LINKS.GITHUB_REPO}
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2"
+        >
+          github.com/kanshakangekiamearashi-cloud/mirai-gikai
+        </a>
+        （AGPL-3.0）／ フォーク元:{" "}
+        <a
+          href={EXTERNAL_LINKS.ORIGINAL_REPO}
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2"
+        >
+          team-mirai/mirai-gikai
+        </a>
+      </p>
+    </div>
+  );
+}
+
 function FooterCopyright() {
   return (
     <div className="text-center text-sm font-medium text-slate-800">
-      © 2025 Team Mirai All rights Reserved
+      © 2026 みらい議会＠東広島市（非公式・個人運営）
     </div>
   );
 }

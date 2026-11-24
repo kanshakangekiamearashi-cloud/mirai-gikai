@@ -19,18 +19,18 @@ export const primaryLinks: FooterLink[] = [
     href: routes.home(),
   },
   {
-    label: "みらい議会とは",
-    href: EXTERNAL_LINKS.ABOUT_NOTE,
+    label: "本家「みらい議会」",
+    href: EXTERNAL_LINKS.ORIGINAL_GIKAI,
     external: true,
   },
   {
-    label: "チームみらいについて",
-    href: EXTERNAL_LINKS.TEAM_MIRAI_ABOUT,
+    label: "東広島市議会公式サイト",
+    href: EXTERNAL_LINKS.HIGASHIHIROSHIMA_COUNCIL,
     external: true,
   },
   {
-    label: "寄附で応援する",
-    href: EXTERNAL_LINKS.DONATION,
+    label: "ソースコード（GitHub）",
+    href: EXTERNAL_LINKS.GITHUB_REPO,
     external: true,
   },
 ];
