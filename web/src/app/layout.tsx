@@ -41,7 +41,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(env.webUrl),
   title: siteTitle,
   description: siteDescription,
-  keywords: [siteName, "議案", "政治", "東広島市", "東広島市議会", "政策", "解説"],
+  keywords: [
+    siteName,
+    "議案",
+    "政治",
+    "東広島市",
+    "東広島市議会",
+    "政策",
+    "解説",
+  ],
   icons: {
     icon: isDev
       ? "/icons/pwa/icon_dev_192_v3.png"
