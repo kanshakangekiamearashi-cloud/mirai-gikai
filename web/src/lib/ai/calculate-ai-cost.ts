@@ -90,7 +90,7 @@ export const modelPricing: Record<string, ModelPricing> = {
   // 公開チャットのデフォルトモデル（@ai-sdk/google 経由）。
   // modelId は Gateway 形式の接頭辞を持たないためリテラルキーで登録する。
   // 無料枠で利用するため $0 として計上する。
-  "gemini-2.5-flash": {
+  "gemini-3.8-flash": {
     inputTokensPerMillionUsd: 0,
     outputTokensPerMillionUsd: 0,
   },

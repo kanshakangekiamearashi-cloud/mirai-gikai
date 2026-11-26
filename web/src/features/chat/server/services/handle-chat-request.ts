@@ -72,7 +72,7 @@ type ChatUsageMetadata =
  * Google AI Studio（@ai-sdk/google）経由で呼び出す。
  * API キーは GOOGLE_GENERATIVE_AI_API_KEY 環境変数から自動で読み込まれる。
  */
-const DEFAULT_CHAT_MODEL = google("gemini-2.5-flash");
+const DEFAULT_CHAT_MODEL = google("gemini-3.8-flash");
 
 /**
  * チャットリクエストを処理してストリーミングレスポンスを返す
