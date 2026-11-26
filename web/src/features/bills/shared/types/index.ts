@@ -80,9 +80,11 @@ export const BILL_STATUS_ORDER: Record<BillStatusEnum, number> = {
 };
 
 // House display mapping
+// このフォークは一院制の市議会版のため、enum（HR/HC）はスキーマ上の
+// 残存値であり、表示上はいずれも「市議会」として扱う。
 export const HOUSE_LABELS: Record<HouseEnum, string> = {
-  HR: "衆議院",
-  HC: "参議院",
+  HR: "市議会",
+  HC: "市議会",
 };
 
 // ステータスを日本語ラベルに変換する関数

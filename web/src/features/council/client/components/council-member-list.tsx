@@ -24,8 +24,9 @@ export function CouncilMemberList({ session, members }: Props) {
           {startYear}年 {session.name}の議員名簿
         </h1>
         <p className="text-xs font-medium text-mirai-text">
-          全{members.length}名（会派別）。副議長は出典で未確認のため、
-          記載していません。
+          全{members.length}名（会派別）。
+          {!members.some((member) => member.role === "vice_chair") &&
+            "副議長は出典で未確認のため、記載していません。"}
         </p>
       </div>
 

@@ -20,15 +20,15 @@ export function DesktopMenuActionButtons() {
       </LinkButton>
 
       <LinkButton
-        href={EXTERNAL_LINKS.DONATION}
+        href={EXTERNAL_LINKS.HIGASHIHIROSHIMA_COUNCIL}
         icon={{
-          src: "/icons/heart-icon.svg",
-          alt: "寄附",
+          src: "/icons/interview-landmark.svg",
+          alt: "東広島市議会",
           width: 20,
           height: 20,
         }}
       >
-        寄附で応援する
+        東広島市議会公式サイト
       </LinkButton>
     </div>
   );

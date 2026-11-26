@@ -24,15 +24,15 @@ describe("getBillStatusLabel", () => {
   });
 
   describe("in_originating_house", () => {
-    it("returns '衆議院審議中' when originatingHouse is HR", () => {
+    it("returns '市議会審議中' when originatingHouse is HR", () => {
       expect(getBillStatusLabel("in_originating_house", "HR")).toBe(
-        "衆議院審議中"
+        "市議会審議中"
       );
     });
 
-    it("returns '参議院審議中' when originatingHouse is HC", () => {
+    it("returns '市議会審議中' when originatingHouse is HC", () => {
       expect(getBillStatusLabel("in_originating_house", "HC")).toBe(
-        "参議院審議中"
+        "市議会審議中"
       );
     });
 
@@ -46,15 +46,15 @@ describe("getBillStatusLabel", () => {
   });
 
   describe("in_receiving_house", () => {
-    it("returns '参議院審議中' when originatingHouse is HR", () => {
+    it("returns '市議会審議中' when originatingHouse is HR", () => {
       expect(getBillStatusLabel("in_receiving_house", "HR")).toBe(
-        "参議院審議中"
+        "市議会審議中"
       );
     });
 
-    it("returns '衆議院審議中' when originatingHouse is HC", () => {
+    it("returns '市議会審議中' when originatingHouse is HC", () => {
       expect(getBillStatusLabel("in_receiving_house", "HC")).toBe(
-        "衆議院審議中"
+        "市議会審議中"
       );
     });
 

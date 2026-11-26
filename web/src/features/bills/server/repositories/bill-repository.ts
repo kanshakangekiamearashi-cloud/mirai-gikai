@@ -41,7 +41,9 @@ export async function findPublishedBillsWithContents(
     throw new Error(`Failed to fetch bills: ${error.message}`);
   }
 
-  return data;
+  // 提出日が全件 null の会期では SQL の並びが不定になるため、
+  // ステータス→提出日→議案番号の決定的な順序にそろえる。
+  return sortByBillListOrder(data);
 }
 
 /**
@@ -213,6 +215,7 @@ export async function findBillContentByDifficulty(
 // Tags (bulk)
 // ============================================================
 
+import { sortByBillListOrder } from "../../shared/utils/bill-list-order";
 import { groupTagsByBillId } from "../../shared/utils/group-tags";
 
 /**
@@ -277,7 +280,9 @@ export async function findPublishedBillsByDietSession(
     throw new Error(`Failed to fetch bills by diet session: ${error.message}`);
   }
 
-  return data;
+  // 提出日が全件 null の会期では同ステータス内の並びが不定になるため、
+  // 議案番号をタイブレークにした決定的な順序にそろえる。
+  return sortByBillListOrder(data);
 }
 
 /**
@@ -318,7 +323,7 @@ export async function findPreviousSessionBills(
     return [];
   }
 
-  return data ?? [];
+  return sortByBillListOrder(data ?? []);
 }
 
 /**

@@ -11,7 +11,7 @@ type FooterLinkItem = {
 
 const links: FooterLinkItem[] = [
   {
-    label: "チームみらいについて",
+    label: "本家・チームみらいについて",
     href: EXTERNAL_LINKS.TEAM_MIRAI_ABOUT,
     external: true,
   },
@@ -24,11 +24,6 @@ const links: FooterLinkItem[] = [
     label: "プライバシーポリシー",
     href: routes.privacy(),
     external: false,
-  },
-  {
-    label: "よくあるご質問",
-    href: EXTERNAL_LINKS.FAQ,
-    external: true,
   },
   {
     label: "自主制作ガイドライン",
@@ -63,7 +58,7 @@ export function DesktopMenuLinks() {
           lineHeight: "1.48em",
         }}
       >
-        © 2025 Team Mirai
+        © 2026 みらい議会＠東広島市
       </p>
     </div>
   );

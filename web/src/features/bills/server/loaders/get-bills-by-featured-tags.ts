@@ -4,6 +4,7 @@ import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/type
 import { getActiveDietSession } from "@/features/diet-sessions/server/loaders/get-active-diet-session";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillsByTag } from "../../shared/types";
+import { sortByBillListOrder } from "../../shared/utils/bill-list-order";
 import {
   findBillIdsWithPublicInterview,
   findFeaturedTags,
@@ -115,10 +116,10 @@ const _getCachedBillsByFeaturedTags = unstable_cache(
     const allBillIds = filteredResults.flatMap((r) => r.bills.map((b) => b.id));
     const interviewBillIds = await findBillIdsWithPublicInterview(allBillIds);
 
-    // インタビュー状態を付与
+    // インタビュー状態を付与し、タグ内は議案番号順にそろえる
     return filteredResults.map((result) => ({
       ...result,
-      bills: result.bills.map((bill) => ({
+      bills: sortByBillListOrder(result.bills).map((bill) => ({
         ...bill,
         hasPublicInterview: interviewBillIds.has(bill.id),
       })),

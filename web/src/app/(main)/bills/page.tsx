@@ -3,9 +3,8 @@ import { BillsListPage } from "@/features/bills/server/components/bills-list-pag
 import type { BillsListSearchParams } from "@/features/bills/shared/utils/parse-bills-list-params";
 
 export const metadata: Metadata = {
-  title: "法案を検索する | みらい議会",
-  description:
-    "国会に提出された法案を、審議状況やカテゴリから探せます。気になる法案にはAIインタビューで意見を届けられます。",
+  title: "議案を検索する | みらい議会",
+  description: "東広島市議会の議案を、審議状況やカテゴリから探せます。",
 };
 
 type Props = {
