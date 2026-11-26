@@ -144,15 +144,6 @@ export async function handleChatRequest({
       system: systemPrompt,
       messages: await convertToModelMessages(messages),
       tools,
-      // 思考（reasoning）は無効化する: このQ&Aでは深い推論より応答速度を
-      // 優先し、無料枠のトークン消費も抑える（thinkingは出力トークンを消費する）
-      providerOptions: {
-        google: {
-          thinkingConfig: {
-            thinkingBudget: 0,
-          },
-        },
-      },
       // ツール呼び出しのみでテキストが無い場合は、もう1ステップ回して応答文を生成させる
       stopWhen: [stepCountIs(CHAT_MAX_STEPS), hasTextInLastStep],
       prepareStep: ({ steps }) => ({
