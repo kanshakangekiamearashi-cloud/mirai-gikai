@@ -13,6 +13,26 @@ describe("SourceCodePromptProvider", () => {
     expect(result.content).toContain('[{"id":"1","name":"テスト法案"}]');
   });
 
+  it("councilDigest を渡すと top-chat-system に一般質問・議員名簿セクションが含まれる", async () => {
+    const result = await provider.getPrompt("top-chat-system", {
+      billSummary: "[]",
+      councilDigest:
+        "### 一般質問（質問者21名・全40項目、登壇順）\n1. 山田 太郎（会派A）",
+    });
+
+    expect(result.content).toContain("## 一般質問・議員名簿の収録データ");
+    expect(result.content).toContain("質問者21名・全40項目");
+    expect(result.content).toContain("山田 太郎");
+  });
+
+  it("councilDigest を渡さなければ top-chat-system に一般質問・議員名簿セクションが出ない", async () => {
+    const result = await provider.getPrompt("top-chat-system", {
+      billSummary: "[]",
+    });
+
+    expect(result.content).not.toContain("## 一般質問・議員名簿の収録データ");
+  });
+
   it("bill-chat-system-normal プロンプトを変数付きで返す", async () => {
     const result = await provider.getPrompt("bill-chat-system-normal", {
       billName: "テスト法案",

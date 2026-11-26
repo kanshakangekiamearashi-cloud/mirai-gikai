@@ -2,31 +2,32 @@ import { google } from "@ai-sdk/google";
 import type { Database } from "@mirai-gikai/supabase";
 import {
   convertToModelMessages,
+  type LanguageModel,
   stepCountIs,
   streamText,
   tool,
-  type LanguageModel,
   type UIMessage,
 } from "ai";
 import { z } from "zod";
 import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
-import type { BillWithContent } from "@/features/bills/shared/types";
-import {
-  SUGGEST_INTERVIEW_TOOL_NAME,
-  SUGGEST_INTERVIEW_TOOL_TYPE,
-} from "@/features/chat/shared/constants";
 import {
   findBillContentByDifficulty,
   findPublishedBillById,
 } from "@/features/bills/server/repositories/bill-repository";
-import { ChatError, ChatErrorCode } from "@/features/chat/shared/types/errors";
-import { pickChatKnowledgeSource } from "@/features/chat/shared/utils/pick-chat-knowledge-source";
-import { extractGatewayCost } from "@/features/chat/server/utils/extract-gateway-cost";
+import type { BillWithContent } from "@/features/bills/shared/types";
 import {
   CHAT_MAX_STEPS,
   hasTextInLastStep,
   selectActiveChatTools,
 } from "@/features/chat/server/utils/chat-step-control";
+import { extractGatewayCost } from "@/features/chat/server/utils/extract-gateway-cost";
+import {
+  SUGGEST_INTERVIEW_TOOL_NAME,
+  SUGGEST_INTERVIEW_TOOL_TYPE,
+} from "@/features/chat/shared/constants";
+import { ChatError, ChatErrorCode } from "@/features/chat/shared/types/errors";
+import { pickChatKnowledgeSource } from "@/features/chat/shared/utils/pick-chat-knowledge-source";
+import { getCouncilChatDigest } from "@/features/council/server/loaders/get-council-chat-digest";
 import { findPublicInterviewConfigByBillId } from "@/features/interview-config/server/repositories/interview-config-repository";
 import { env } from "@/lib/env";
 import {
@@ -219,8 +220,17 @@ async function buildPrompt(
   // 公開済み bill が引けない場合は bill コンテキスト自体を空にする。
   let variables: Record<string, string>;
   if (context.pageContext?.type === "home") {
+    // 一般質問・議員名簿のダイジェストもサーバー側で DB から取得して渡す。
+    // 取得に失敗してもチャット自体は継続する（議案情報のみで回答させる）。
+    let councilDigest = "";
+    try {
+      councilDigest = await getCouncilChatDigest();
+    } catch (error) {
+      console.error("Council chat digest fetch error:", error);
+    }
     variables = {
       billSummary: JSON.stringify(context.pageContext.bills ?? ""),
+      councilDigest,
     };
   } else {
     const billId = context.billContext?.id;

@@ -30,7 +30,7 @@ const PROMPT_BUILDERS: Record<string, (variables: PromptVariables) => string> =
           'Missing required variable "billSummary" for prompt "top-chat-system"'
         );
       }
-      return buildTopChatSystemPrompt(v.billSummary);
+      return buildTopChatSystemPrompt(v.billSummary, v.councilDigest ?? "");
     },
     "bill-chat-system-normal": (v) => {
       validateBillVariables(v, "bill-chat-system-normal");

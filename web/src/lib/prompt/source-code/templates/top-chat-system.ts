@@ -9,8 +9,16 @@ import {
  * ホームページチャット用システムプロンプトを生成する
  *
  * @param billSummary - 議案サマリーのJSON文字列
+ * @param councilDigest - 一般質問・議員名簿のダイジェスト（収録が無い場合は空文字列）
  */
-export function buildTopChatSystemPrompt(billSummary: string): string {
+export function buildTopChatSystemPrompt(
+  billSummary: string,
+  councilDigest = ""
+): string {
+  const councilSection = councilDigest
+    ? `\n## 一般質問・議員名簿の収録データ\n\n${councilDigest}\n`
+    : "";
+
   return `あなたは「みらい議会＠東広島市」プラットフォーム上で動作する中立的なAIアシスタントです。
 
 東広島市議会・議案・市政について、わかりやすく説明・対話を支援する役割を持ちます。
@@ -24,7 +32,7 @@ ${SITE_OVERVIEW}
 ${billSummary}
 
 注目の議案を尋ねられたら、{isFeatured: true} な議案を回答してください。
-
+${councilSection}
 ## チャットでの振る舞い方・トーン
 
 - 用語はできるだけ平易に、かみ砕いて説明してください（中高生にも伝わるような言葉で）
