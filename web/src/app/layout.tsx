@@ -1,15 +1,17 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { Lexend_Giga, Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
+import { Lexend_Giga, Noto_Serif_JP } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import type { ReactNode } from "react";
 import { env } from "@/lib/env";
 
-const notoSansJP = Noto_Sans_JP({
-  variable: "--font-noto-sans-jp",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
+// Noto Sans JP は next/font/google 経由では読み込まない。
+// Google Fonts が返すフォントファイル URL の形式変更（/l/font?kit=...）に
+// next@15.5.x のローダーが対応しておらず、ビルドが失敗するため、
+// スタイルシートを <link> で直接読み込む。
+// CSS 変数 --font-noto-sans-jp は globals.css の :root で定義している。
+const notoSansJpStylesheetUrl =
+  "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap";
 
 const lexendGiga = Lexend_Giga({
   variable: "--font-lexend-giga",
@@ -100,8 +102,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link href={notoSansJpStylesheetUrl} rel="stylesheet" />
+      </head>
       <body
-        className={`${notoSansJP.variable} ${lexendGiga.variable} ${notoSerifJP.variable} font-sans antialiased bg-mirai-surface-light`}
+        className={`${lexendGiga.variable} ${notoSerifJP.variable} font-sans antialiased bg-mirai-surface-light`}
       >
         <NextTopLoader showSpinner={false} color="#203864" />
         {children}

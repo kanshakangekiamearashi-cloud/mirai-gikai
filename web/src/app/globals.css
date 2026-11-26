@@ -132,6 +132,8 @@
 }
 
 :root {
+  /* Noto Sans JP は layout.tsx の <link> で読み込むため、変数をここで定義する */
+  --font-noto-sans-jp: "Noto Sans JP", sans-serif;
   --radius: 0.625rem;
   --background: #f7f4ee;
   --foreground: oklch(0.145 0 0);
