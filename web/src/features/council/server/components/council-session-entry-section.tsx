@@ -77,7 +77,8 @@ type EntryCardProps = {
   label: string;
 };
 
-function EntryCard({ href, label }: EntryCardProps) {
+/** 会期入口セクションと過去の定例会セクションで共用する導線カード。 */
+export function EntryCard({ href, label }: EntryCardProps) {
   return (
     <Link
       href={href}

@@ -18,7 +18,9 @@ import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
 import { pickHomeSections } from "@/features/bills/shared/utils/pick-home-sections";
 import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
 import { CouncilSessionEntrySection } from "@/features/council/server/components/council-session-entry-section";
+import { PastCouncilSessionsSection } from "@/features/council/server/components/past-council-sessions-section";
 import { getCouncilSessionSummary } from "@/features/council/server/loaders/get-council-session-summary";
+import { getPastCouncilSessionEntries } from "@/features/council/server/loaders/get-past-council-session-entries";
 import { CurrentDietSession } from "@/features/diet-sessions/client/components/current-diet-session";
 import { getCurrentDietSession } from "@/features/diet-sessions/server/loaders/get-current-diet-session";
 import { getLatestClosedDietSession } from "@/features/diet-sessions/server/loaders/get-latest-closed-diet-session";
@@ -62,6 +64,11 @@ export default async function Home() {
       ? await getCouncilSessionSummary(entrySession.id, currentDifficulty)
       : null;
 
+  // 過去の定例会への入口。入口の会期より前の会期をDBから取得する。
+  const pastEntries = entrySession
+    ? await getPastCouncilSessionEntries(entrySession, currentDifficulty)
+    : [];
+
   const { tagGroups, shownBills, featuredBillIds } = pickHomeSections({
     billsByTag,
     featuredBills,
@@ -93,6 +100,11 @@ export default async function Home() {
           session={{ ...entrySession, slug: entrySlug }}
           summary={sessionSummary}
         />
+      )}
+
+      {/* 過去の定例会（議案・一般質問）への入口 */}
+      {pastEntries.length > 0 && (
+        <PastCouncilSessionsSection entries={pastEntries} />
       )}
 
       <Container>

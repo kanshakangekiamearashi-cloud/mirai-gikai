@@ -1,5 +1,6 @@
 import type { DietSession } from "@/features/diet-sessions/shared/types";
 import type { GeneralQuestion } from "../../shared/types";
+import { formatAnswerSourceLabel } from "../../shared/utils/format-answer-source-label";
 import { groupQuestionsBySpeaker } from "../../shared/utils/group-questions-by-speaker";
 
 type Props = {
@@ -26,9 +27,8 @@ export function GeneralQuestionList({ session, questions }: Props) {
         </h1>
         <p className="text-xs font-medium text-mirai-text">
           {groups.length}名・{questions.length}
-          項目（登壇順）。答弁要旨は議会だよりvol.213の要旨であり、
-          本会議会議録の逐語ではありません。会議録が未公開のため、
-          抜粋掲載のない項目は「未確認」と明記しています。
+          項目（登壇順）。答弁要旨が掲載されている項目は、議会だよりの要旨であり、
+          本会議会議録の逐語ではありません。掲載のない項目は「未確認」と明記しています。
         </p>
       </div>
 
@@ -63,7 +63,7 @@ export function GeneralQuestionList({ session, questions }: Props) {
                   item.answer_summary ? (
                     <div className="flex flex-col gap-1">
                       <p className="text-xs font-bold text-primary-accent">
-                        答弁要旨（{item.answer_source ?? "議会だよりvol.213"}）
+                        {formatAnswerSourceLabel(item.answer_source)}
                       </p>
                       <p className="text-sm text-mirai-text leading-[1.8] whitespace-pre-wrap">
                         {item.answer_summary}
