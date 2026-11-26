@@ -5,6 +5,7 @@ import {
   Check,
   Clock,
   ExternalLink,
+  FileText,
   type LucideIcon,
   MessageSquare,
   Search,
@@ -302,6 +303,7 @@ const STATUS_GROUP_ICONS: Record<BillStatusGroup, LucideIcon> = {
   waiting: Clock,
   enacted: Check,
   rejected: X,
+  reported: FileText,
 };
 
 /**

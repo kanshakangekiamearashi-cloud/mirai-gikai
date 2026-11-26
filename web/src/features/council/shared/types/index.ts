@@ -28,3 +28,14 @@ export type CouncilMember = {
   created_at: string;
   updated_at: string;
 };
+
+export type BillCommitteeQa = {
+  id: string;
+  bill_id: string;
+  question_summary: string;
+  answer_summary: string;
+  source: string;
+  seq: number;
+  created_at: string;
+  updated_at: string;
+};

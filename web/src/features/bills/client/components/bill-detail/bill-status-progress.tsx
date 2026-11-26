@@ -1,15 +1,13 @@
-import type { BillStatusEnum, HouseEnum } from "../../../shared/types";
+import type { BillStatusEnum } from "../../../shared/types";
 import {
   calculateProgressWidth,
   getCurrentStep,
-  getOrderedSteps,
   getStatusMessage,
   getStepState,
 } from "../../../shared/utils/bill-progress";
 
 interface BillStatusProgressProps {
   status: BillStatusEnum;
-  originatingHouse: HouseEnum;
   statusNote?: string | null;
 }
 
@@ -25,13 +23,15 @@ interface ProgressStepProps {
   isPreparing: boolean;
 }
 
-// 基本ステップ定義
+// 基本ステップ定義（市議会の一院制に合わせた中立な段階表示）
 const BASE_STEPS = [
-  { label: "法案\n提出" },
-  { label: "衆議院\n審議" },
-  { label: "参議院\n審議" },
-  { label: "法案\n成立" },
+  { label: "提出" },
+  { label: "審議" },
+  { label: "議決" },
 ] as const;
+
+// 報告（議決対象外）のステップ定義
+const REPORTED_STEPS = [{ label: "報告" }] as const;
 
 // ステータスバッジコンポーネント
 function StatusBadge({ message }: StatusBadgeProps) {
@@ -95,14 +95,15 @@ function ProgressStep({
 
 export function BillStatusProgress({
   status,
-  originatingHouse,
   statusNote,
 }: BillStatusProgressProps) {
   const isPreparing = status === "preparing";
-  const currentStep = getCurrentStep(status);
+  // 報告は議決を経ないため、「報告」の単独ステップで表示する
+  const isReported = status === "reported";
+  const currentStep = isReported ? 1 : getCurrentStep(status);
 
-  const orderedSteps = getOrderedSteps(originatingHouse, BASE_STEPS);
-  const progressWidth = calculateProgressWidth(currentStep);
+  const orderedSteps = isReported ? REPORTED_STEPS : BASE_STEPS;
+  const progressWidth = isReported ? 100 : calculateProgressWidth(currentStep);
 
   const statusMessage = getStatusMessage(status, statusNote);
 

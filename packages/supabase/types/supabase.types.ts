@@ -93,6 +93,47 @@ export type Database = {
           },
         ]
       }
+      bill_committee_qa: {
+        Row: {
+          answer_summary: string
+          bill_id: string
+          created_at: string
+          id: string
+          question_summary: string
+          seq: number
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          answer_summary: string
+          bill_id: string
+          created_at?: string
+          id?: string
+          question_summary: string
+          seq: number
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          answer_summary?: string
+          bill_id?: string
+          created_at?: string
+          id?: string
+          question_summary?: string
+          seq?: number
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bill_committee_qa_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bill_contents: {
         Row: {
           bill_id: string
@@ -1687,6 +1728,7 @@ export type Database = {
         | "enacted"
         | "rejected"
         | "preparing"
+        | "reported"
       bill_video_kind: "stance_decision" | "caucus"
       chat_role_enum: "user" | "system" | "assistant"
       council_member_role_enum: "chair" | "vice_chair" | "member"
@@ -1865,6 +1907,7 @@ export const Constants = {
         "enacted",
         "rejected",
         "preparing",
+        "reported",
       ],
       bill_video_kind: ["stance_decision", "caucus"],
       chat_role_enum: ["user", "system", "assistant"],

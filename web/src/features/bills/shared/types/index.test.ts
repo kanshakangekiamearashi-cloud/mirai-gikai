@@ -19,6 +19,10 @@ describe("getBillStatusLabel", () => {
     expect(getBillStatusLabel("rejected")).toBe("否決");
   });
 
+  it("returns '報告' for reported", () => {
+    expect(getBillStatusLabel("reported")).toBe("報告");
+  });
+
   describe("in_originating_house", () => {
     it("returns '衆議院審議中' when originatingHouse is HR", () => {
       expect(getBillStatusLabel("in_originating_house", "HR")).toBe(

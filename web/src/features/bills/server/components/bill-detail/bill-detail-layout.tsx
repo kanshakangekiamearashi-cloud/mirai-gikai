@@ -1,5 +1,7 @@
 import { Container } from "@/components/layouts/container";
 import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
+import { CommitteeQaSection } from "@/features/council/client/components/committee-qa-section";
+import { getCommitteeQaByBillId } from "@/features/council/server/loaders/get-committee-qa-by-bill-id";
 import { InterviewLandingSection } from "@/features/interview-config/client/components/interview-landing-section";
 import { getInterviewConfig } from "@/features/interview-config/server/loaders/get-interview-config";
 import { getPublicReportsByBillId } from "@/features/interview-report/server/loaders/get-public-reports-by-bill-id";
@@ -25,13 +27,19 @@ export async function BillDetailLayout({
   bill,
   currentDifficulty,
 }: BillDetailLayoutProps) {
-  const [interviewConfig, publicReportsResult, topicAnalysis, videos] =
-    await Promise.all([
-      getInterviewConfig(bill.id),
-      getPublicReportsByBillId(bill.id),
-      getPublicTopicAnalysis(bill.id),
-      getBillVideos(bill.id),
-    ]);
+  const [
+    interviewConfig,
+    publicReportsResult,
+    topicAnalysis,
+    videos,
+    committeeQa,
+  ] = await Promise.all([
+    getInterviewConfig(bill.id),
+    getPublicReportsByBillId(bill.id),
+    getPublicTopicAnalysis(bill.id),
+    getBillVideos(bill.id),
+    getCommitteeQaByBillId(bill.id),
+  ]);
 
   return (
     <div className="container mx-auto pb-8 max-w-4xl">
@@ -57,7 +65,6 @@ export async function BillDetailLayout({
           <div className="my-8">
             <BillStatusProgress
               status={bill.status}
-              originatingHouse={bill.originating_house}
               statusNote={bill.status_note}
             />
           </div>
@@ -67,6 +74,13 @@ export async function BillDetailLayout({
       </BillDetailClient>
 
       <Container>
+        {/* 委員会での質疑（出典に掲載がある議案のみ） */}
+        {committeeQa.length > 0 && (
+          <div className="my-8">
+            <CommitteeQaSection committeeQa={committeeQa} />
+          </div>
+        )}
+
         {/* 法案のトピック一覧（AIインタビュー意見の整理） */}
         <div className="my-8">
           <BillTopicsPreviewSection

@@ -18,6 +18,10 @@ describe("getCardStatusLabel", () => {
     expect(getCardStatusLabel("rejected")).toBe("否決");
   });
 
+  it("reported → 報告", () => {
+    expect(getCardStatusLabel("reported")).toBe("報告");
+  });
+
   it("preparing → 法案提出前", () => {
     expect(getCardStatusLabel("preparing")).toBe("法案提出前");
   });
@@ -38,6 +42,10 @@ describe("getStatusVariant", () => {
 
   it("rejected → dark", () => {
     expect(getStatusVariant("rejected")).toBe("dark");
+  });
+
+  it("reported → muted", () => {
+    expect(getStatusVariant("reported")).toBe("muted");
   });
 
   it("preparing → muted", () => {

@@ -11,6 +11,8 @@ export function getCardStatusLabel(status: BillStatusEnum): string {
       return "法案成立";
     case "rejected":
       return "否決";
+    case "reported":
+      return "報告";
     default:
       return "法案提出前";
   }
@@ -29,6 +31,7 @@ export function getStatusVariant(
       return "default";
     case "rejected":
       return "dark";
+    // reported（報告）と preparing（提出前）は控えめな表示にする
     default:
       return "muted";
   }

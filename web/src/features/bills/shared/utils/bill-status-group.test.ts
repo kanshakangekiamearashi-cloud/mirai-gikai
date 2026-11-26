@@ -29,6 +29,10 @@ describe("toBillStatusGroup", () => {
     expect(toBillStatusGroup("enacted")).toBe("enacted");
     expect(toBillStatusGroup("rejected")).toBe("rejected");
   });
+
+  it("報告は専用グループ（成立に混ぜない）", () => {
+    expect(toBillStatusGroup("reported")).toBe("reported");
+  });
 });
 
 describe("isBillStatusGroup", () => {
@@ -61,6 +65,7 @@ describe("countByStatusGroup", () => {
       waiting: 1,
       enacted: 1,
       rejected: 1,
+      reported: 0,
     });
   });
 
@@ -71,6 +76,7 @@ describe("countByStatusGroup", () => {
       waiting: 0,
       enacted: 0,
       rejected: 0,
+      reported: 0,
     });
   });
 });
@@ -88,6 +94,14 @@ describe("filterByStatusGroup", () => {
 
   it("指定グループだけ残す", () => {
     expect(filterByStatusGroup(bills, "enacted")).toEqual([bill("enacted")]);
+  });
+
+  it("報告グループは報告だけ残す", () => {
+    const withReport = [...bills, bill("reported")];
+    expect(filterByStatusGroup(withReport, "reported")).toEqual([
+      bill("reported"),
+    ]);
+    expect(isBillStatusGroup("reported")).toBe(true);
   });
 
   it("該当が無ければ空", () => {
