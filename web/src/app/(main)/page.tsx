@@ -1,7 +1,7 @@
 import { Container } from "@/components/layouts/container";
 import { About } from "@/components/top/about";
+import { AboutThisEdition } from "@/components/top/about-this-edition";
 import { ComingSoonSection } from "@/components/top/coming-soon-section";
-import { TeamMirai } from "@/components/top/team-mirai";
 import { getDifficultyLevel } from "@/features/bill-difficulty/server/loaders/get-difficulty-level";
 import { BillDisclaimer } from "@/features/bills/client/components/bill-detail/bill-disclaimer";
 import { BillSearchOverlay } from "@/features/bills/client/components/bill-search-overlay";
@@ -17,6 +17,8 @@ import type { BillWithContent } from "@/features/bills/shared/types";
 import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
 import { pickHomeSections } from "@/features/bills/shared/utils/pick-home-sections";
 import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
+import { CouncilSessionEntrySection } from "@/features/council/server/components/council-session-entry-section";
+import { getCouncilSessionSummary } from "@/features/council/server/loaders/get-council-session-summary";
 import { CurrentDietSession } from "@/features/diet-sessions/client/components/current-diet-session";
 import { getCurrentDietSession } from "@/features/diet-sessions/server/loaders/get-current-diet-session";
 import { getLatestClosedDietSession } from "@/features/diet-sessions/server/loaders/get-latest-closed-diet-session";
@@ -51,6 +53,15 @@ export default async function Home() {
 
   const inSession = currentSession !== null;
 
+  // 会期入口セクションの対象は、開催中の会期→無ければ直近に閉会した会期。
+  // slug が無い会期は会期ページへリンクできないので対象にしない。
+  const entrySession = currentSession ?? latestClosedSession;
+  const entrySlug = entrySession?.slug ?? null;
+  const sessionSummary =
+    entrySession && entrySlug
+      ? await getCouncilSessionSummary(entrySession.id, currentDifficulty)
+      : null;
+
   const { tagGroups, shownBills, featuredBillIds } = pickHomeSections({
     billsByTag,
     featuredBills,
@@ -69,12 +80,20 @@ export default async function Home() {
 
   return (
     <>
-      {/* 本日の国会セクション */}
+      {/* 東広島市議会の会期セクション */}
       <CurrentDietSession
         session={currentSession}
         closedSession={latestClosedSession}
         now={japanTime}
       />
+
+      {/* 会期の収録（議案・一般質問・議員名簿）への入口 */}
+      {entrySession && entrySlug && sessionSummary && (
+        <CouncilSessionEntrySection
+          session={{ ...entrySession, slug: entrySlug }}
+          summary={sessionSummary}
+        />
+      )}
 
       <Container>
         <div className="pt-4">
@@ -143,8 +162,8 @@ export default async function Home() {
         {/* みらい議会とは セクション */}
         <About />
 
-        {/* チームみらいについて セクション */}
-        <TeamMirai />
+        {/* みらい議会＠東広島市について セクション */}
+        <AboutThisEdition />
 
         {/* 免責事項 */}
         <BillDisclaimer />

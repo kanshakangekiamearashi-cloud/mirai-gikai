@@ -13,7 +13,7 @@ type CurrentDietSessionProps = {
 };
 
 /**
- * 今国会の状況カード。
+ * 東広島市議会の会期状況カード。
  *
  * 会期中は進行バーと残り日数を出す。パーセンテージだけだと寄付の目標額のように
  * 読まれるため、召集日と閉会予定日を併記する。
@@ -39,7 +39,9 @@ export function CurrentDietSession({
             }`}
             aria-hidden
           />
-          <span className="whitespace-nowrap text-xl font-bold">本日は</span>
+          <span className="whitespace-nowrap text-xl font-bold">
+            東広島市議会は
+          </span>
           {/* 会期中は状態そのものを目立たせ、閉会中は落ち着かせる。 */}
           <span
             className={`rounded-full px-3.5 py-1 text-[15px] font-bold ${
@@ -48,7 +50,7 @@ export function CurrentDietSession({
                 : "bg-mirai-surface-muted text-mirai-text-secondary"
             }`}
           >
-            {inSession ? "国会会期中" : "国会閉会中"}
+            {inSession ? "会期中" : "閉会中"}
           </span>
           {inSession && (
             <span className="text-[15px] font-bold text-mirai-brand-teal-deep md:ml-auto">

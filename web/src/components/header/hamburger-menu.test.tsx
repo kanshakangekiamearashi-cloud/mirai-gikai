@@ -71,7 +71,7 @@ describe("HamburgerMenu", () => {
     await user.click(screen.getByRole("button", { name: "法案を検索" }));
 
     expect(await screen.findByRole("dialog")).toHaveAccessibleDescription(
-      "キーワードやテーマから法案を探せます。"
+      "キーワードやテーマから議案を探せます。"
     );
     expect(screen.getByRole("link", { name: /暮らし/ })).toBeInTheDocument();
     await waitFor(() => {
