@@ -12,6 +12,6 @@ export function resolveBillShareImageUrl(
   return (
     bill?.share_thumbnail_url ||
     bill?.thumbnail_url ||
-    new URL("/ogp.jpg", webUrl).toString()
+    new URL("/opengraph-image", webUrl).toString()
   );
 }

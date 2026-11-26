@@ -31,12 +31,12 @@ describe("resolveBillShareImageUrl", () => {
         { share_thumbnail_url: null, thumbnail_url: null },
         WEB_URL
       )
-    ).toBe("https://example.com/ogp.jpg");
+    ).toBe("https://example.com/opengraph-image");
   });
 
   it("bill が null でもデフォルトOGPを返す", () => {
     expect(resolveBillShareImageUrl(null, WEB_URL)).toBe(
-      "https://example.com/ogp.jpg"
+      "https://example.com/opengraph-image"
     );
   });
 });

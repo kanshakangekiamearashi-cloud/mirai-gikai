@@ -32,8 +32,10 @@ const siteTitle = "みらい議会＠東広島市";
 const siteDescription =
   "東広島市議会で今どんな議案が検討されているか、わかりやすく伝える非公式プラットフォーム";
 const siteName = "みらい議会＠東広島市";
+// OGP画像は src/app/opengraph-image.tsx で動的生成する（この版のブランド）。
+// 上流の /ogp.jpg はバイナリのためフォーク側では差し替えできない。
 const ogImage = {
-  url: "/ogp.jpg",
+  url: "/opengraph-image",
   width: 1200,
   height: 630,
   alt: "みらい議会＠東広島市のOGPイメージ",
@@ -53,11 +55,22 @@ export const metadata: Metadata = {
     "解説",
   ],
   icons: {
-    icon: isDev
-      ? "/icons/pwa/icon_dev_192_v3.png"
-      : isStaging
-        ? "/icons/pwa/icon_staging_192.png"
-        : "/icons/pwa/icon_android_192.png",
+    // この版のアイコン（SVG）を先に置き、モダンブラウザに優先させる。
+    // PNG は SVG 非対応環境向けのフォールバック。
+    icon: [
+      {
+        url: "/icons/mirai-gikai-higashihiroshima.svg",
+        type: "image/svg+xml",
+      },
+      {
+        url: isDev
+          ? "/icons/pwa/icon_dev_192_v3.png"
+          : isStaging
+            ? "/icons/pwa/icon_staging_192.png"
+            : "/icons/pwa/icon_android_192.png",
+        type: "image/png",
+      },
+    ],
     apple: isStaging
       ? "/icons/pwa/icon_staging_ios.png"
       : "/icons/pwa/icon_ios.png",

@@ -74,7 +74,12 @@ export function CategoryTabScroller({ children }: { children: ReactNode }) {
         onScroll={sync}
         className="scrollbar-hide overflow-x-auto"
       >
-        <div ref={content} className="w-max">
+        {/*
+          右端の送りボタン（sm以上で表示）に最後のタブが隠れないよう、
+          ボタンの重なり幅ぶんだけ右に余白を空け、末尾まで送れば
+          最後のタブの件数まで全部見えるようにする。
+        */}
+        <div ref={content} className="w-max sm:pr-24">
           {children}
         </div>
       </div>
