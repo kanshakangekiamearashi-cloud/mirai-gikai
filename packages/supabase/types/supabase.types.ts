@@ -494,6 +494,92 @@ export type Database = {
           },
         ]
       }
+      council_committees: {
+        Row: {
+          as_of: string
+          category: string
+          created_at: string
+          diet_session_id: string
+          id: string
+          name: string
+          seq: number
+          updated_at: string
+        }
+        Insert: {
+          as_of: string
+          category: string
+          created_at?: string
+          diet_session_id: string
+          id?: string
+          name: string
+          seq: number
+          updated_at?: string
+        }
+        Update: {
+          as_of?: string
+          category?: string
+          created_at?: string
+          diet_session_id?: string
+          id?: string
+          name?: string
+          seq?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "council_committees_diet_session_id_fkey"
+            columns: ["diet_session_id"]
+            isOneToOne: false
+            referencedRelation: "diet_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      council_member_committees: {
+        Row: {
+          council_committee_id: string
+          council_member_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["council_member_role_enum"]
+          seq: number
+          updated_at: string
+        }
+        Insert: {
+          council_committee_id: string
+          council_member_id: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["council_member_role_enum"]
+          seq: number
+          updated_at?: string
+        }
+        Update: {
+          council_committee_id?: string
+          council_member_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["council_member_role_enum"]
+          seq?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "council_member_committees_council_committee_id_fkey"
+            columns: ["council_committee_id"]
+            isOneToOne: false
+            referencedRelation: "council_committees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "council_member_committees_council_member_id_fkey"
+            columns: ["council_member_id"]
+            isOneToOne: false
+            referencedRelation: "council_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       council_members: {
         Row: {
           created_at: string

@@ -1,8 +1,8 @@
 import type { CouncilMember } from "../types";
 
-export type FactionMemberGroup = {
+export type FactionMemberGroup<T extends CouncilMember = CouncilMember> = {
   faction: string;
-  members: CouncilMember[];
+  members: T[];
 };
 
 /**
@@ -10,11 +10,11 @@ export type FactionMemberGroup = {
  *
  * 会派の並びは最初に現れた順序を保持し、会派内の議員順も入力順のままにする。
  */
-export function groupMembersByFaction(
-  members: CouncilMember[]
-): FactionMemberGroup[] {
-  const groups: FactionMemberGroup[] = [];
-  const byFaction = new Map<string, FactionMemberGroup>();
+export function groupMembersByFaction<T extends CouncilMember>(
+  members: T[]
+): FactionMemberGroup<T>[] {
+  const groups: FactionMemberGroup<T>[] = [];
+  const byFaction = new Map<string, FactionMemberGroup<T>>();
   for (const member of members) {
     let group = byFaction.get(member.faction);
     if (!group) {
