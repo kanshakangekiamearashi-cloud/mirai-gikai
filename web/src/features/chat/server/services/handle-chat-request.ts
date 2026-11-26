@@ -394,11 +394,10 @@ function buildSystemPromptWithInterviewInstructions(
  * チャットで使用するツール一覧を構築
  */
 function buildTools(shouldSuggestInterview: boolean) {
-  // biome-ignore lint/suspicious/noExplicitAny: Google の provider ツールは型が互換でないため
-  const tools: Record<string, any> = {
-    // Google 検索グラウンディング（provider ツールは google_search という名前が必須）
-    google_search: google.tools.googleSearch({}),
-  };
+  // Web検索（Google 検索グラウンディング）は無料枠のクォータ対象外のため使用しない。
+  // 回答は収録データの範囲で行う（プロンプト側のルールと対応）。
+  // biome-ignore lint/suspicious/noExplicitAny: ツールごとに型が異なるため緩い型で保持する
+  const tools: Record<string, any> = {};
 
   if (shouldSuggestInterview) {
     tools[SUGGEST_INTERVIEW_TOOL_NAME] = tool({

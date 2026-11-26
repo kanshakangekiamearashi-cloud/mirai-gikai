@@ -39,6 +39,16 @@ describe("buildBillChatSystemNormalPrompt", () => {
     expect(result).not.toContain("国会議員");
   });
 
+  it("Web検索は利用できず、収録データの範囲で回答するルールが含まれる", () => {
+    const result = buildBillChatSystemNormalPrompt("a", "b", "c", "d");
+
+    expect(result).toContain("Web検索ツールは利用できません");
+    expect(result).toContain("収録データにはありません");
+    // 旧来のWeb検索ツールの利用ルールは含まれない
+    expect(result).not.toContain("Web検索ツールの利用ルール");
+    expect(result).not.toContain("引用元のURLを明記");
+  });
+
   it("knowledgeSource を渡すと <knowledge_source> セクションが含まれる", () => {
     const result = buildBillChatSystemNormalPrompt(
       "a",

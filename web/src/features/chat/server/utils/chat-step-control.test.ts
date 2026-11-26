@@ -35,7 +35,7 @@ describe("hasTextInLastStep", () => {
 });
 
 describe("selectActiveChatTools", () => {
-  const toolNames = ["google_search", "suggest_interview"];
+  const toolNames = ["other_tool", "suggest_interview"];
 
   it("suggest_interview 未呼び出しなら全ツールを返す", () => {
     expect(selectActiveChatTools(toolNames, [])).toEqual(toolNames);
@@ -46,13 +46,13 @@ describe("selectActiveChatTools", () => {
       selectActiveChatTools(toolNames, [
         { text: "", toolCalls: [{ toolName: "suggest_interview" }] },
       ])
-    ).toEqual(["google_search"]);
+    ).toEqual(["other_tool"]);
   });
 
   it("他のツール呼び出しだけなら除外しない", () => {
     expect(
       selectActiveChatTools(toolNames, [
-        { text: "", toolCalls: [{ toolName: "google_search" }] },
+        { text: "", toolCalls: [{ toolName: "other_tool" }] },
       ])
     ).toEqual(toolNames);
   });

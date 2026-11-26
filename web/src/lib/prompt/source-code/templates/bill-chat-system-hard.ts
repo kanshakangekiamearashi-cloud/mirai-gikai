@@ -1,9 +1,9 @@
 import { buildKnowledgeSourceSection } from "./knowledge-source-section";
 import {
+  ANSWER_SCOPE_RULES,
   COMMON_RULES,
   EDITION_OVERVIEW,
   SITE_OVERVIEW,
-  WEB_SEARCH_RULES,
 } from "./shared-sections";
 
 /**
@@ -39,7 +39,7 @@ ${buildKnowledgeSourceSection(knowledgeSource)}
 
 ${COMMON_RULES}
 
-${WEB_SEARCH_RULES}
+${ANSWER_SCOPE_RULES}
 
 以降、ユーザーから質問が来たら、この背景情報をもとに丁寧に応えるようにしてください。`;
 }
