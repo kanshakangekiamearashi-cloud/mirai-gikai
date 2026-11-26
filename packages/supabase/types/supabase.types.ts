@@ -453,6 +453,50 @@ export type Database = {
           },
         ]
       }
+      council_members: {
+        Row: {
+          created_at: string
+          diet_session_id: string
+          faction: string
+          id: string
+          name: string
+          reading: string
+          role: Database["public"]["Enums"]["council_member_role_enum"]
+          seq: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diet_session_id: string
+          faction: string
+          id?: string
+          name: string
+          reading: string
+          role?: Database["public"]["Enums"]["council_member_role_enum"]
+          seq: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diet_session_id?: string
+          faction?: string
+          id?: string
+          name?: string
+          reading?: string
+          role?: Database["public"]["Enums"]["council_member_role_enum"]
+          seq?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "council_members_diet_session_id_fkey"
+            columns: ["diet_session_id"]
+            isOneToOne: false
+            referencedRelation: "diet_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diet_sessions: {
         Row: {
           created_at: string
@@ -518,6 +562,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      general_questions: {
+        Row: {
+          answer_source: string | null
+          answer_status: Database["public"]["Enums"]["answer_status_enum"]
+          answer_summary: string | null
+          asked_on: string
+          created_at: string
+          diet_session_id: string
+          id: string
+          seq: number
+          speaker_faction: string
+          speaker_name: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          answer_source?: string | null
+          answer_status: Database["public"]["Enums"]["answer_status_enum"]
+          answer_summary?: string | null
+          asked_on: string
+          created_at?: string
+          diet_session_id: string
+          id?: string
+          seq: number
+          speaker_faction: string
+          speaker_name: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          answer_source?: string | null
+          answer_status?: Database["public"]["Enums"]["answer_status_enum"]
+          answer_summary?: string | null
+          asked_on?: string
+          created_at?: string
+          diet_session_id?: string
+          id?: string
+          seq?: number
+          speaker_faction?: string
+          speaker_name?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "general_questions_diet_session_id_fkey"
+            columns: ["diet_session_id"]
+            isOneToOne: false
+            referencedRelation: "diet_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       interview_configs: {
         Row: {
@@ -1574,6 +1671,7 @@ export type Database = {
       }
     }
     Enums: {
+      answer_status_enum: "summary_published" | "not_published"
       article_report_category:
         | "factual_error"
         | "outdated"
@@ -1591,6 +1689,7 @@ export type Database = {
         | "preparing"
       bill_video_kind: "stance_decision" | "caucus"
       chat_role_enum: "user" | "system" | "assistant"
+      council_member_role_enum: "chair" | "vice_chair" | "member"
       difficulty_level_enum: "normal" | "hard"
       house_enum: "HR" | "HC"
       interview_config_status_enum: "public" | "closed"
@@ -1749,6 +1848,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      answer_status_enum: ["summary_published", "not_published"],
       article_report_category: [
         "factual_error",
         "outdated",
@@ -1768,6 +1868,7 @@ export const Constants = {
       ],
       bill_video_kind: ["stance_decision", "caucus"],
       chat_role_enum: ["user", "system", "assistant"],
+      council_member_role_enum: ["chair", "vice_chair", "member"],
       difficulty_level_enum: ["normal", "hard"],
       house_enum: ["HR", "HC"],
       interview_config_status_enum: ["public", "closed"],

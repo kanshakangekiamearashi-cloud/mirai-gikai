@@ -3,10 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layouts/container";
-import { routes } from "@/lib/routes";
-import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { getBillsByDietSession } from "@/features/bills/server/loaders/get-bills-by-diet-session";
+import { getCouncilMembersBySessionId } from "@/features/council/server/loaders/get-council-members-by-session";
+import { getGeneralQuestionsBySessionId } from "@/features/council/server/loaders/get-general-questions-by-session";
 import { DietSessionBillList } from "@/features/diet-sessions/client/components/diet-session-bill-list";
+import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
+import { routes } from "@/lib/routes";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -35,6 +37,10 @@ export default async function DietSessionBillsPage({ params }: Props) {
   }
 
   const bills = await getBillsByDietSession(session.id);
+  const [questions, members] = await Promise.all([
+    getGeneralQuestionsBySessionId(session.id),
+    getCouncilMembersBySessionId(session.id),
+  ]);
 
   return (
     <div className="bg-mirai-surface-muted">
@@ -54,6 +60,36 @@ export default async function DietSessionBillsPage({ params }: Props) {
       <Container className="py-8">
         <DietSessionBillList session={session} bills={bills} />
       </Container>
+
+      {/* 一般質問・議員名簿への導線（収録がある会期のみ） */}
+      {(questions.length > 0 || members.length > 0) && (
+        <Container className="pb-8">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {questions.length > 0 && (
+              <Link
+                href={routes.kokkaiSessionQuestions(slug)}
+                className="flex flex-1 items-center justify-between rounded-2xl bg-white px-5 py-4"
+              >
+                <span className="text-[15px] font-bold text-black">
+                  一般質問（{questions.length}項目）
+                </span>
+                <ChevronRight className="h-5 w-5 text-black" />
+              </Link>
+            )}
+            {members.length > 0 && (
+              <Link
+                href={routes.kokkaiSessionMembers(slug)}
+                className="flex flex-1 items-center justify-between rounded-2xl bg-white px-5 py-4"
+              >
+                <span className="text-[15px] font-bold text-black">
+                  議員名簿（{members.length}名）
+                </span>
+                <ChevronRight className="h-5 w-5 text-black" />
+              </Link>
+            )}
+          </div>
+        </Container>
+      )}
 
       {/* パンくずリスト */}
       <Container className="py-8">

@@ -49,4 +49,7 @@ export const routes = {
 
   // ── 国会セッション ────────────────────────────────
   kokkaiSessionBills: (slug: string) => `/kokkai/${slug}/bills` as const,
+  kokkaiSessionQuestions: (slug: string) =>
+    `/kokkai/${slug}/questions` as const,
+  kokkaiSessionMembers: (slug: string) => `/kokkai/${slug}/members` as const,
 } as const;
