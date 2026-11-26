@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import type { Database } from "@mirai-gikai/supabase";
 import {
   convertToModelMessages,
@@ -34,7 +34,6 @@ import {
   createPromptProvider,
   type PromptProvider,
 } from "@/lib/prompt";
-import { AI_MODELS } from "@/lib/ai/models";
 import { isWithinDailyCostLimit, recordChatUsage } from "./cost-tracker";
 import {
   checkSystemDailyCostLimit,
@@ -66,6 +65,14 @@ export type HandleChatDeps = {
 
 type ChatUsageMetadata =
   Database["public"]["Tables"]["chat_usage_events"]["Insert"]["metadata"];
+
+/**
+ * 公開チャット（トップ／議案ページ）のデフォルトモデル。
+ * Gemini の無料枠を使うため、Vercel AI Gateway 経由ではなく
+ * Google AI Studio（@ai-sdk/google）経由で呼び出す。
+ * API キーは GOOGLE_GENERATIVE_AI_API_KEY 環境変数から自動で読み込まれる。
+ */
+const DEFAULT_CHAT_MODEL = google("gemini-2.5-flash");
 
 /**
  * チャットリクエストを処理してストリーミングレスポンスを返す
@@ -107,7 +114,7 @@ export async function handleChatRequest({
     promptProvider
   );
   // Model configuration
-  const model = deps?.model ?? AI_MODELS.gpt5_4_mini_fast;
+  const model = deps?.model ?? DEFAULT_CHAT_MODEL;
   const modelName =
     typeof model === "string" ? model : (model.modelId ?? "unknown");
 
@@ -387,9 +394,10 @@ function buildSystemPromptWithInterviewInstructions(
  * チャットで使用するツール一覧を構築
  */
 function buildTools(shouldSuggestInterview: boolean) {
-  // biome-ignore lint/suspicious/noExplicitAny: OpenAI web_search tool type incompatibility
+  // biome-ignore lint/suspicious/noExplicitAny: Google の provider ツールは型が互換でないため
   const tools: Record<string, any> = {
-    web_search: openai.tools.webSearch(),
+    // Google 検索グラウンディング（provider ツールは google_search という名前が必須）
+    google_search: google.tools.googleSearch({}),
   };
 
   if (shouldSuggestInterview) {
