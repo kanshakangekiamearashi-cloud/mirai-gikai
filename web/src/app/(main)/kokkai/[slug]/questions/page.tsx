@@ -2,10 +2,14 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layouts/container";
+import { getDifficultyLevel } from "@/features/bill-difficulty/server/loaders/get-difficulty-level";
+import { getBillsByDietSession } from "@/features/bills/server/loaders/get-bills-by-diet-session";
+import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
+import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
 import { GeneralQuestionList } from "@/features/council/client/components/general-question-list";
 import { getGeneralQuestionsBySessionId } from "@/features/council/server/loaders/get-general-questions-by-session";
-import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { SessionHero } from "@/features/diet-sessions/server/components/session-hero";
+import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { routes } from "@/lib/routes";
 
 type Props = {
@@ -34,7 +38,11 @@ export default async function DietSessionQuestionsPage({ params }: Props) {
     notFound();
   }
 
-  const questions = await getGeneralQuestionsBySessionId(session.id);
+  const [questions, bills, currentDifficulty] = await Promise.all([
+    getGeneralQuestionsBySessionId(session.id),
+    getBillsByDietSession(session.id),
+    getDifficultyLevel(),
+  ]);
 
   return (
     <div className="bg-mirai-surface-muted">
@@ -59,6 +67,16 @@ export default async function DietSessionQuestionsPage({ params }: Props) {
           <span className="text-black">一般質問</span>
         </nav>
       </Container>
+
+      {/* チャットはトップと同じものを出す。一般質問・議員名簿・委員会の文脈で答える。 */}
+      <HomeChatClient
+        currentDifficulty={currentDifficulty}
+        bills={bills.map((bill) => ({
+          name: chatBillName(bill),
+          summary: bill.bill_content?.summary,
+          tags: bill.tags?.map((tag) => tag.label) ?? [],
+        }))}
+      />
     </div>
   );
 }

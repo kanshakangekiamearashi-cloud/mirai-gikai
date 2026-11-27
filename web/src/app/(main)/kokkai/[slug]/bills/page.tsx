@@ -2,12 +2,15 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layouts/container";
+import { getDifficultyLevel } from "@/features/bill-difficulty/server/loaders/get-difficulty-level";
 import { getBillsByDietSession } from "@/features/bills/server/loaders/get-bills-by-diet-session";
+import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
+import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
 import { getCouncilMembersBySessionId } from "@/features/council/server/loaders/get-council-members-by-session";
 import { getGeneralQuestionsBySessionId } from "@/features/council/server/loaders/get-general-questions-by-session";
 import { DietSessionBillList } from "@/features/diet-sessions/client/components/diet-session-bill-list";
-import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { SessionHero } from "@/features/diet-sessions/server/components/session-hero";
+import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { routes } from "@/lib/routes";
 
 type Props = {
@@ -37,9 +40,10 @@ export default async function DietSessionBillsPage({ params }: Props) {
   }
 
   const bills = await getBillsByDietSession(session.id);
-  const [questions, members] = await Promise.all([
+  const [questions, members, currentDifficulty] = await Promise.all([
     getGeneralQuestionsBySessionId(session.id),
     getCouncilMembersBySessionId(session.id),
+    getDifficultyLevel(),
   ]);
 
   return (
@@ -91,6 +95,16 @@ export default async function DietSessionBillsPage({ params }: Props) {
           <span className="text-black">過去の議案</span>
         </nav>
       </Container>
+
+      {/* チャットはトップと同じものを出す。一般質問・議員名簿・委員会の文脈で答える。 */}
+      <HomeChatClient
+        currentDifficulty={currentDifficulty}
+        bills={bills.map((bill) => ({
+          name: chatBillName(bill),
+          summary: bill.bill_content?.summary,
+          tags: bill.tags?.map((tag) => tag.label) ?? [],
+        }))}
+      />
     </div>
   );
 }
