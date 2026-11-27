@@ -33,6 +33,10 @@ describe("toBillStatusGroup", () => {
   it("報告は専用グループ（成立に混ぜない）", () => {
     expect(toBillStatusGroup("reported")).toBe("reported");
   });
+
+  it("撤回承認は専用グループ（審議中・成立に混ぜない）", () => {
+    expect(toBillStatusGroup("withdrawn")).toBe("withdrawn");
+  });
 });
 
 describe("isBillStatusGroup", () => {
@@ -66,6 +70,7 @@ describe("countByStatusGroup", () => {
       enacted: 1,
       rejected: 1,
       reported: 0,
+      withdrawn: 0,
     });
   });
 
@@ -77,6 +82,7 @@ describe("countByStatusGroup", () => {
       enacted: 0,
       rejected: 0,
       reported: 0,
+      withdrawn: 0,
     });
   });
 });
@@ -102,6 +108,15 @@ describe("filterByStatusGroup", () => {
       bill("reported"),
     ]);
     expect(isBillStatusGroup("reported")).toBe(true);
+  });
+
+  it("撤回承認グループは撤回承認だけ残す", () => {
+    const withWithdrawn = [...bills, bill("withdrawn")];
+    expect(filterByStatusGroup(withWithdrawn, "withdrawn")).toEqual([
+      bill("withdrawn"),
+    ]);
+    expect(isBillStatusGroup("withdrawn")).toBe(true);
+    expect(countByStatusGroup(withWithdrawn).withdrawn).toBe(1);
   });
 
   it("該当が無ければ空", () => {

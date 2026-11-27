@@ -1,4 +1,8 @@
-import type { CouncilMember, GeneralQuestion } from "../types";
+import type {
+  CouncilCommitteeDigestEntry,
+  CouncilMember,
+  GeneralQuestion,
+} from "../types";
 import { countDistinctSpeakers } from "./count-distinct-speakers";
 import { groupMembersByFaction } from "./group-members-by-faction";
 import { groupQuestionsBySpeaker } from "./group-questions-by-speaker";
@@ -11,11 +15,14 @@ import { groupQuestionsBySpeaker } from "./group-questions-by-speaker";
  * 一般質問は質問者ごとに項目を並べ、公表済みの答弁要旨は全文を含める。
  * 未公表の項目にはその旨のマーカーを付ける。
  * 議員名簿は議長・副議長を先頭に示し、残りは会派ごとに1行で列挙する。
- * 両方とも空の場合は空文字列を返す（プロンプト側でセクションごと省略する）。
+ * 委員会は議員名簿の後に、委員会ごとに1行で委員長・副委員長・委員を列挙する。
+ * すべて空の場合は空文字列を返す（プロンプト側でセクションごと省略する）。
+ * 委員会引数は省略可能で、空の場合は委員会セクションごと省略する。
  */
 export function buildCouncilDigest(
   questions: GeneralQuestion[],
-  members: CouncilMember[]
+  members: CouncilMember[],
+  committees: CouncilCommitteeDigestEntry[] = []
 ): string {
   const sections: string[] = [];
 
@@ -25,8 +32,38 @@ export function buildCouncilDigest(
   if (members.length > 0) {
     sections.push(buildMembersSection(members));
   }
+  if (committees.length > 0) {
+    sections.push(buildCommitteesSection(committees));
+  }
 
   return sections.join("\n\n");
+}
+
+function buildCommitteesSection(
+  committees: CouncilCommitteeDigestEntry[]
+): string {
+  const lines: string[] = [`### 委員会（全${committees.length}委員会）`];
+
+  const sorted = [...committees].sort((a, b) => a.seq - b.seq);
+  for (const committee of sorted) {
+    const fragments: string[] = [];
+    if (committee.chairName) {
+      fragments.push(`委員長 ${committee.chairName}`);
+    }
+    if (committee.viceChairName) {
+      fragments.push(`副委員長 ${committee.viceChairName}`);
+    }
+    if (committee.memberNames.length > 0) {
+      fragments.push(`委員 ${committee.memberNames.join("、")}`);
+    }
+    lines.push(
+      fragments.length > 0
+        ? `- ${committee.name}：${fragments.join("、")}`
+        : `- ${committee.name}`
+    );
+  }
+
+  return lines.join("\n");
 }
 
 function buildQuestionsSection(questions: GeneralQuestion[]): string {

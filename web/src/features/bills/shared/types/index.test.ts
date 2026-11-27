@@ -23,6 +23,10 @@ describe("getBillStatusLabel", () => {
     expect(getBillStatusLabel("reported")).toBe("報告");
   });
 
+  it("returns '撤回承認' for withdrawn", () => {
+    expect(getBillStatusLabel("withdrawn")).toBe("撤回承認");
+  });
+
   describe("in_originating_house", () => {
     it("returns '市議会審議中' when originatingHouse is HR", () => {
       expect(getBillStatusLabel("in_originating_house", "HR")).toBe(

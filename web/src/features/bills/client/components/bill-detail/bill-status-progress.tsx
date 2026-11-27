@@ -30,8 +30,12 @@ const BASE_STEPS = [
   { label: "議決" },
 ] as const;
 
-// 報告（議決対象外）のステップ定義
-const REPORTED_STEPS = [{ label: "報告" }] as const;
+// 議決の進捗バーに乗らないステータスは、専用ラベルの単独ステップで表示する。
+// reported（報告・議決対象外）と withdrawn（撤回承認）が該当する。
+const SINGLE_STEP_LABELS: Partial<Record<BillStatusEnum, string>> = {
+  reported: "報告",
+  withdrawn: "撤回承認",
+};
 
 // ステータスバッジコンポーネント
 function StatusBadge({ message }: StatusBadgeProps) {
@@ -98,12 +102,17 @@ export function BillStatusProgress({
   statusNote,
 }: BillStatusProgressProps) {
   const isPreparing = status === "preparing";
-  // 報告は議決を経ないため、「報告」の単独ステップで表示する
-  const isReported = status === "reported";
-  const currentStep = isReported ? 1 : getCurrentStep(status);
+  // 報告・撤回承認は通常の議決ステップに乗らないため、専用ラベルの
+  // 単独ステップで表示する
+  const singleStepLabel = SINGLE_STEP_LABELS[status];
+  const currentStep = singleStepLabel ? 1 : getCurrentStep(status);
 
-  const orderedSteps = isReported ? REPORTED_STEPS : BASE_STEPS;
-  const progressWidth = isReported ? 100 : calculateProgressWidth(currentStep);
+  const orderedSteps: readonly { label: string }[] = singleStepLabel
+    ? [{ label: singleStepLabel }]
+    : BASE_STEPS;
+  const progressWidth = singleStepLabel
+    ? 100
+    : calculateProgressWidth(currentStep);
 
   const statusMessage = getStatusMessage(status, statusNote);
 

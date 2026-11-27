@@ -8,7 +8,13 @@ import type { BillWithContent } from "@/features/bills/shared/types";
 import { CompactBillCard } from "@/features/bills/client/components/bill-list/compact-bill-card";
 import { routes } from "@/lib/routes";
 
-type FilterType = "all" | "enacted" | "rejected" | "reported" | "other";
+type FilterType =
+  | "all"
+  | "enacted"
+  | "rejected"
+  | "reported"
+  | "withdrawn"
+  | "other";
 
 type Props = {
   bills: BillWithContent[];
@@ -18,9 +24,10 @@ function getFilterCounts(bills: BillWithContent[]) {
   const enacted = bills.filter((b) => b.status === "enacted").length;
   const rejected = bills.filter((b) => b.status === "rejected").length;
   const reported = bills.filter((b) => b.status === "reported").length;
-  const other = bills.length - enacted - rejected - reported;
+  const withdrawn = bills.filter((b) => b.status === "withdrawn").length;
+  const other = bills.length - enacted - rejected - reported - withdrawn;
 
-  return { all: bills.length, enacted, rejected, reported, other };
+  return { all: bills.length, enacted, rejected, reported, withdrawn, other };
 }
 
 function filterBills(
@@ -34,12 +41,15 @@ function filterBills(
       return bills.filter((b) => b.status === "rejected");
     case "reported":
       return bills.filter((b) => b.status === "reported");
+    case "withdrawn":
+      return bills.filter((b) => b.status === "withdrawn");
     case "other":
       return bills.filter(
         (b) =>
           b.status !== "enacted" &&
           b.status !== "rejected" &&
-          b.status !== "reported"
+          b.status !== "reported" &&
+          b.status !== "withdrawn"
       );
     default:
       return bills;
@@ -56,6 +66,7 @@ export function BillListWithStatusFilter({ bills }: Props) {
     { key: "enacted", label: "成立", count: counts.enacted },
     { key: "rejected", label: "否決", count: counts.rejected },
     { key: "reported", label: "報告", count: counts.reported },
+    { key: "withdrawn", label: "撤回承認", count: counts.withdrawn },
     { key: "other", label: "その他", count: counts.other },
   ];
 

@@ -3,12 +3,14 @@ import "server-only";
 import { getCurrentDietSession } from "@/features/diet-sessions/server/loaders/get-current-diet-session";
 import { getLatestClosedDietSession } from "@/features/diet-sessions/server/loaders/get-latest-closed-diet-session";
 import { getJapanTime } from "@/lib/utils/date";
+import type { CouncilCommitteeDigestEntry } from "../../shared/types";
 import { buildCouncilDigest } from "../../shared/utils/build-council-digest";
+import { getCouncilCommitteesForDigest } from "./get-council-committees-for-digest";
 import { getCouncilMembersBySessionId } from "./get-council-members-by-session";
 import { getGeneralQuestionsBySessionId } from "./get-general-questions-by-session";
 
 /**
- * トップページ用チャットに渡す、一般質問・議員名簿のダイジェストを取得する。
+ * トップページ用チャットに渡す、一般質問・議員名簿・委員会のダイジェストを取得する。
  *
  * 対象会期はトップページの会期入口セクションと同じ
  * （開催中の会期、無ければ直近に閉会した会期）。
@@ -23,10 +25,24 @@ export async function getCouncilChatDigest(): Promise<string> {
     return "";
   }
 
-  const [questions, members] = await Promise.all([
+  const [questions, members, committees] = await Promise.all([
     getGeneralQuestionsBySessionId(session.id),
     getCouncilMembersBySessionId(session.id),
+    // 委員会の取得に失敗してもチャット自体は止めない。
+    // 委員会セクションなしのダイジェストを返す。
+    fetchCommitteesSafely(session.id),
   ]);
 
-  return buildCouncilDigest(questions, members);
+  return buildCouncilDigest(questions, members, committees);
+}
+
+async function fetchCommitteesSafely(
+  sessionId: string
+): Promise<CouncilCommitteeDigestEntry[]> {
+  try {
+    return await getCouncilCommitteesForDigest(sessionId);
+  } catch (error) {
+    console.error("Failed to fetch council committees for chat digest:", error);
+    return [];
+  }
 }

@@ -34,6 +34,10 @@ describe("getStatusMessage", () => {
       "報告（議決対象外）"
     );
   });
+
+  test("withdrawn は statusNote（撤回承認）をそのまま返す", () => {
+    expect(getStatusMessage("withdrawn", "撤回承認")).toBe("撤回承認");
+  });
 });
 
 describe("getStepState", () => {
@@ -105,5 +109,9 @@ describe("getCurrentStep", () => {
 
   test("reported は 1（単独ステップ表示のための提出済み相当）", () => {
     expect(getCurrentStep("reported")).toBe(1);
+  });
+
+  test("withdrawn は 1（単独ステップ表示のための提出済み相当）", () => {
+    expect(getCurrentStep("withdrawn")).toBe(1);
   });
 });

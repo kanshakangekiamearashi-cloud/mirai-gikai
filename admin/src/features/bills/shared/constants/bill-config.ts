@@ -43,4 +43,8 @@ export const BILL_STATUS_CONFIG: Record<
     icon: FileText,
     color: "text-gray-600 bg-gray-50",
   },
+  withdrawn: {
+    icon: FileText,
+    color: "text-gray-600 bg-gray-50",
+  },
 };

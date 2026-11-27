@@ -46,6 +46,7 @@ const BILL_STATUS_OPTIONS: Array<{ value: BillStatus; label: string }> = [
   { value: "enacted", label: "成立" },
   { value: "rejected", label: "否決" },
   { value: "reported", label: "報告" },
+  { value: "withdrawn", label: "撤回承認" },
 ];
 
 const ORIGINATING_HOUSE_OPTIONS = Object.entries(HOUSE_LABELS).map(

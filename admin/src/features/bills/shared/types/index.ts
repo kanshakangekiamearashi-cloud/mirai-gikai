@@ -50,6 +50,7 @@ export const BILL_STATUS_ORDER: Record<BillStatus, number> = {
   introduced: 4,
   preparing: 5,
   reported: 6,
+  withdrawn: 7,
 };
 
 // House display mapping
@@ -90,6 +91,8 @@ export function getBillStatusLabel(
       return "否決";
     case "reported":
       return "報告";
+    case "withdrawn":
+      return "撤回承認";
     default:
       return status;
   }

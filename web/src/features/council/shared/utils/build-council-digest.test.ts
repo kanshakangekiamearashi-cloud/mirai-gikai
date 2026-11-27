@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { CouncilMember, GeneralQuestion } from "../types";
+import type {
+  CouncilCommitteeDigestEntry,
+  CouncilMember,
+  GeneralQuestion,
+} from "../types";
 import { buildCouncilDigest } from "./build-council-digest";
 
 function makeQuestion(
@@ -92,6 +96,19 @@ function makeSessionMembers(): CouncilMember[] {
   return members;
 }
 
+function makeCommittee(
+  overrides: Partial<CouncilCommitteeDigestEntry> = {}
+): CouncilCommitteeDigestEntry {
+  return {
+    name: "総務委員会",
+    seq: 1,
+    chairName: "佐藤 太郎",
+    viceChairName: "鈴木 花子",
+    memberNames: ["田中 一郎", "高橋 二郎"],
+    ...overrides,
+  };
+}
+
 describe("buildCouncilDigest", () => {
   it("一般質問の総数（質問者数・項目数）を見出しに含める", () => {
     const digest = buildCouncilDigest(makeSessionQuestions(), []);
@@ -169,6 +186,82 @@ describe("buildCouncilDigest", () => {
 
   it("両方とも空の場合は空文字列を返す", () => {
     expect(buildCouncilDigest([], [])).toBe("");
+  });
+
+  it("委員会セクションは議員名簿の後に、委員長・副委員長・委員を1行で含める", () => {
+    const digest = buildCouncilDigest([], makeSessionMembers(), [
+      makeCommittee(),
+      makeCommittee({
+        name: "文教委員会",
+        seq: 2,
+        chairName: "佐藤 次郎",
+        viceChairName: "鈴木 三郎",
+        memberNames: ["田中 四郎"],
+      }),
+    ]);
+
+    expect(digest).toContain("委員会（全2委員会）");
+    expect(digest).toContain(
+      "- 総務委員会：委員長 佐藤 太郎、副委員長 鈴木 花子、委員 田中 一郎、高橋 二郎"
+    );
+    expect(digest).toContain(
+      "- 文教委員会：委員長 佐藤 次郎、副委員長 鈴木 三郎、委員 田中 四郎"
+    );
+    // 委員会セクションは議員名簿セクションより後に出る
+    expect(digest.indexOf("委員会（全2委員会）")).toBeGreaterThan(
+      digest.indexOf("議員名簿（全29名）")
+    );
+  });
+
+  it("委員会は seq 順に並べる", () => {
+    const digest = buildCouncilDigest([], [], [
+      makeCommittee({ name: "文教委員会", seq: 2 }),
+      makeCommittee({ name: "総務委員会", seq: 1 }),
+    ]);
+
+    expect(digest.indexOf("- 総務委員会")).toBeLessThan(
+      digest.indexOf("- 文教委員会")
+    );
+  });
+
+  it("委員長が記録されていない委員会では委員長の断片を省略する", () => {
+    const digest = buildCouncilDigest([], [], [
+      makeCommittee({ chairName: null }),
+    ]);
+
+    const line = digest
+      .split("\n")
+      .find((l) => l.startsWith("- 総務委員会"));
+    expect(line).toBe(
+      "- 総務委員会：副委員長 鈴木 花子、委員 田中 一郎、高橋 二郎"
+    );
+    // 副委員長にも「委員長」の文字列が含まれるため、委員会名の直後に
+    // 委員長の役職として出ていないことだけを見る
+    expect(line?.startsWith("- 総務委員会：委員長")).toBe(false);
+  });
+
+  it("副委員長も委員もいない委員会では名前だけの行になる", () => {
+    const digest = buildCouncilDigest([], [], [
+      makeCommittee({ viceChairName: null, memberNames: [] }),
+    ]);
+
+    expect(digest).toContain(
+      "- 総務委員会：委員長 佐藤 太郎"
+    );
+  });
+
+  it("委員会が空の場合は委員会セクションを省略する", () => {
+    const digest = buildCouncilDigest(
+      makeSessionQuestions(),
+      makeSessionMembers(),
+      []
+    );
+
+    expect(digest).not.toContain("委員会（");
+    // 引数自体を省略した場合も同じ
+    expect(buildCouncilDigest([], makeSessionMembers())).not.toContain(
+      "委員会（"
+    );
   });
 
   it("片方だけの場合はそのセクションだけを返す", () => {

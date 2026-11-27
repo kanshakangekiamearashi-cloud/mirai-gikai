@@ -50,6 +50,19 @@ export type CouncilMemberCommittee = {
   updated_at: string;
 };
 
+/**
+ * チャット用ダイジェストに渡す委員会1件分。
+ * 委員長・副委員長は役職付きで別に持ち、それ以外の委員は名前だけを並べる。
+ * 役職が記録されていない委員会では null のままにし、推測で埋めない。
+ */
+export type CouncilCommitteeDigestEntry = {
+  name: string;
+  seq: number;
+  chairName: string | null;
+  viceChairName: string | null;
+  memberNames: string[];
+};
+
 /** 議員1名分の委員会所属（委員会名と委員会での役職） */
 export type MemberCommitteeAssignment = {
   name: string;

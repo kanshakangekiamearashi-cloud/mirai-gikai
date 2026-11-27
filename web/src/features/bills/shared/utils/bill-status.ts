@@ -13,6 +13,8 @@ export function getCardStatusLabel(status: BillStatusEnum): string {
       return "否決";
     case "reported":
       return "報告";
+    case "withdrawn":
+      return "撤回承認";
     default:
       return "議案提出前";
   }
@@ -31,6 +33,9 @@ export function getStatusVariant(
       return "default";
     case "rejected":
       return "dark";
+    case "withdrawn":
+      // withdrawn（撤回承認）は終局した中立状態として控えめな表示にする
+      return "muted";
     // reported（報告）と preparing（提出前）は控えめな表示にする
     default:
       return "muted";

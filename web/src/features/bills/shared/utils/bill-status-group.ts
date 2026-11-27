@@ -3,10 +3,11 @@ import type { BillStatusEnum } from "../types";
 /**
  * 法案一覧のステータス絞り込みで使うグループ。
  *
- * DB の status は7値（preparing / introduced / in_originating_house /
- * in_receiving_house / enacted / rejected / reported）だが、一覧のタブは束ねて表示する。
+ * DB の status は8値（preparing / introduced / in_originating_house /
+ * in_receiving_house / enacted / rejected / reported / withdrawn）だが、一覧のタブは束ねて表示する。
  * 審議の場所（衆・参）は絞り込みの軸としては細かすぎるため、まとめて「審議中」にする。
  * reported（報告・議決対象外）は「成立」と誤認されないよう専用グループにする。
+ * withdrawn（撤回承認）も「審議中」や「成立」と誤認されないよう専用グループにする。
  */
 export const BILL_STATUS_GROUPS = [
   "all",
@@ -15,6 +16,7 @@ export const BILL_STATUS_GROUPS = [
   "enacted",
   "rejected",
   "reported",
+  "withdrawn",
 ] as const;
 
 export type BillStatusGroup = (typeof BILL_STATUS_GROUPS)[number];
@@ -26,6 +28,7 @@ export const BILL_STATUS_GROUP_LABELS: Record<BillStatusGroup, string> = {
   enacted: "成立",
   rejected: "否決",
   reported: "報告",
+  withdrawn: "撤回承認",
 };
 
 /**
@@ -51,6 +54,8 @@ export function toBillStatusGroup(
       return "rejected";
     case "reported":
       return "reported";
+    case "withdrawn":
+      return "withdrawn";
     default:
       return "waiting";
   }
@@ -75,6 +80,7 @@ export function countByStatusGroup(
     enacted: 0,
     rejected: 0,
     reported: 0,
+    withdrawn: 0,
   };
   for (const bill of bills) {
     counts[toBillStatusGroup(bill.status)] += 1;

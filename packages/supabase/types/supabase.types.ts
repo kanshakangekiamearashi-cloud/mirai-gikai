@@ -1815,6 +1815,7 @@ export type Database = {
         | "rejected"
         | "preparing"
         | "reported"
+        | "withdrawn"
       bill_video_kind: "stance_decision" | "caucus"
       chat_role_enum: "user" | "system" | "assistant"
       council_member_role_enum: "chair" | "vice_chair" | "member"
@@ -1994,6 +1995,7 @@ export const Constants = {
         "rejected",
         "preparing",
         "reported",
+        "withdrawn",
       ],
       bill_video_kind: ["stance_decision", "caucus"],
       chat_role_enum: ["user", "system", "assistant"],

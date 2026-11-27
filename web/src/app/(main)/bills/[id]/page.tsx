@@ -29,8 +29,13 @@ export async function generateMetadata({
   const description = bill.bill_content?.summary || "議案の詳細情報";
   const shareImageUrl = resolveBillShareImageUrl(bill, env.webUrl);
 
+  // ブラウザのタブには、カードや詳細見出しと同じわかりやすい見出し
+  // （plain_summary「〜する議案」）を使う。共有用の openGraph / twitter の
+  // タイトルは正式名称（bill.name）のままにする。
+  const tabTitle = bill.plain_summary?.trim() ? bill.plain_summary : bill.name;
+
   return {
-    title: bill.name,
+    title: tabTitle,
     description: description,
     alternates: {
       canonical: routes.billDetail(bill.id),

@@ -22,6 +22,10 @@ describe("getCardStatusLabel", () => {
     expect(getCardStatusLabel("reported")).toBe("報告");
   });
 
+  it("withdrawn → 撤回承認", () => {
+    expect(getCardStatusLabel("withdrawn")).toBe("撤回承認");
+  });
+
   it("preparing → 議案提出前", () => {
     expect(getCardStatusLabel("preparing")).toBe("議案提出前");
   });
@@ -46,6 +50,10 @@ describe("getStatusVariant", () => {
 
   it("reported → muted", () => {
     expect(getStatusVariant("reported")).toBe("muted");
+  });
+
+  it("withdrawn → muted", () => {
+    expect(getStatusVariant("withdrawn")).toBe("muted");
   });
 
   it("preparing → muted", () => {
