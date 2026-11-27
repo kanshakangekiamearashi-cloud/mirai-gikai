@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 128" role="img" aria-label="みらい議会＠東広島市 ロゴ">
-  <rect x="35" y="4" width="80" height="80" rx="18" fill="#203864"/>
+  <rect x="35" y="4" width="80" height="80" rx="18" fill="#8c3a22"/>
   <circle cx="75" cy="44" r="26" fill="none" stroke="#b9975b" stroke-width="4"/>
   <text x="75" y="58" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="30" font-weight="700" fill="#ffffff">東</text>
-  <text x="75" y="108" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="700" fill="#203864">みらい議会＠東広島市</text>
+  <text x="75" y="108" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="15" font-weight="700" fill="#8c3a22">みらい議会＠東広島市</text>
   <text x="75" y="124" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="8" fill="#8a6d3b">HIGASHIHIROSHIMA CITY COUNCIL (UNOFFICIAL)</text>
 </svg>

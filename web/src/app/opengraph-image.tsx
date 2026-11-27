@@ -9,7 +9,7 @@ import { ImageResponse } from "next/og";
  * みらい議会＠東広島市の OGP 画像。
  *
  * 上流の /ogp.jpg（バイナリ）はフォーク側で差し替えできないため、
- * この版のブランド（深い藍 #203864 × アンティークゴールド #b9975b）で
+ * この版のブランド（煉瓦色 #8c3a22 × アンティークゴールド #b9975b）で
  * 動的に生成する。フォント取得に失敗した場合はデフォルトフォントで
  * 描画を続行する（buildOgFontOptions が fonts を省略する）。
  */
@@ -18,8 +18,8 @@ export const alt =
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const INDIGO = "#203864";
-const INDIGO_DARK = "#14243f";
+const BRICK = "#8c3a22";
+const BRICK_DARK = "#582515";
 const GOLD = "#b9975b";
 const GOLD_LIGHT = "#efe3c2";
 
@@ -36,7 +36,7 @@ export default async function OpengraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: "64px 72px",
-        backgroundImage: `linear-gradient(135deg, ${INDIGO} 0%, ${INDIGO_DARK} 100%)`,
+        backgroundImage: `linear-gradient(135deg, ${BRICK} 0%, ${BRICK_DARK} 100%)`,
         fontFamily: OG_FONT_FAMILY,
         color: "#ffffff",
       }}
@@ -52,7 +52,7 @@ export default async function OpengraphImage() {
             alignItems: "center",
             justifyContent: "center",
             backgroundImage: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_LIGHT} 100%)`,
-            color: INDIGO,
+            color: BRICK,
             fontSize: 76,
             fontWeight: 700,
           }}

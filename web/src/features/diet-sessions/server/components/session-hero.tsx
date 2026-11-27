@@ -5,7 +5,7 @@ import "server-only";
  *
  * 上流の国会議事堂写真（/img/archive-hero-7f3d06.png）はバイナリ資産で
  * フォーク側では差し替えできないため、この版のブランド
- * （深い藍＝primary × アンティークゴールドのグラデーション）で描画する。
+ * （煉瓦色＝primary × アンティークゴールドのグラデーション）で描画する。
  */
 export function SessionHero({ label }: { label: string }) {
   return (

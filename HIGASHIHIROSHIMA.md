@@ -14,9 +14,9 @@
 | # | 要件 | 対応 |
 |---|------|------|
 | 1 | サービス名称は「みらい議会＠地域名」形式 | 「みらい議会＠東広島市」に変更（`web/src/app/layout.tsx` の siteTitle / siteName / description / keywords、開発者向けページ、フッターのロゴ alt 等） |
-| 2 | ロゴの変更（チームみらいのロゴ使用禁止） | `web/public/img/logo.svg` を独自ロゴ（深い藍 `#203864` の角丸スクエア＋アンティークゴールドのリング＋「東」の文字）に差し替え。OGP用ロゴ `packages/shared/src/og/ogp-logo.png` はバイナリのため未対応（下記「未対応事項」参照） |
+| 2 | ロゴの変更（チームみらいのロゴ使用禁止） | `web/public/img/logo.svg` を独自ロゴ（煉瓦色 `#8c3a22` の角丸スクエア＋アンティークゴールドのリング＋「東」の文字）に差し替え。OGP用ロゴ `packages/shared/src/og/ogp-logo.png` はバイナリのため未対応（下記「未対応事項」参照） |
 | 3 | トップ画像・OGP画像の変更 | バイナリ差し替えが必要なため未対応（下記参照）。OGP画像の alt テキストは東広島市版に変更済み |
-| 4 | カラーテーマの変更 | `--primary` を本家の `#2aa693` から `#203864`（深い藍）に、`--primary-accent` を `#14243f` に、グラデーションをアンティークゴールド系（`#b9975b` → `#efe3c2`）に変更（`web/src/app/globals.css`）。`layout.tsx` の themeColor とローディングバーの色も `#203864` に統一。広島市版の深緑 `#175c3a`、廿日市市版の朱 `#8c2f1b` とも異なる色にした |
+| 4 | カラーテーマの変更 | `--primary` を本家の `#2aa693` から `#8c3a22`（煉瓦色＝酒蔵の赤レンガ）に、`--primary-accent` を `#582515` に、グラデーションをアンティークゴールド系（`#b9975b` → `#efe3c2`）に変更（`web/src/app/globals.css`）。`layout.tsx` の themeColor とローディングバーの色、`manifest.json` の theme_color も `#8c3a22` に統一。当初は深い藍 `#203864`／`#14243f` で公開したが、2026-11-28 にユーザーの承認で煉瓦色へ変更した。広島市版の深緑 `#175c3a`、廿日市市版の朱 `#8c2f1b` とも異なる色にした |
 | 5 | 免責文言の表示 | フッターに「これは政党チームみらいが運営しているものではありません」を表示する専用セクションを追加（`web/src/components/layouts/footer/footer.tsx`）。README と開発者向けページにも併記 |
 | 6 | ソースコード公開先へのリンク表示 | `web/src/config/external-links.ts` の `GITHUB_REPO` を本フォーク（https://github.com/kanshakangekiamearashi-cloud/mirai-gikai）に設定。フッター（「ソースコード（GitHub）」リンク＋免責セクション内のリンク）と開発者向けページ（`EXTERNAL_LINKS.GITHUB_REPO` 参照）から辿れる。本リポジトリは Public |
 

@@ -141,8 +141,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #203864;
-  --primary-accent: #14243f;
+  --primary: #8c3a22;
+  --primary-accent: #582515;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -264,7 +264,7 @@
   }
 
   .bg-mirai-light-gradient {
-    background-image: linear-gradient(to bottom, #fdf6e0, #e3e9f4);
+    background-image: linear-gradient(to bottom, #fdf6e0, #f6e9df);
   }
 
   .bg-mirai-white-fade {

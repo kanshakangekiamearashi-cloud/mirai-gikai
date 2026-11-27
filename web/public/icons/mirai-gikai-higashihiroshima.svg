@@ -5,7 +5,7 @@
       <stop offset="1" stop-color="#efe3c2"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#203864"/>
+  <rect width="64" height="64" rx="14" fill="#8c3a22"/>
   <rect x="3.5" y="3.5" width="57" height="57" rx="11.5" fill="none" stroke="url(#gold)" stroke-width="2"/>
   <text x="32" y="45" font-size="33" font-weight="700" text-anchor="middle" fill="#ffffff" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif">東</text>
 </svg>

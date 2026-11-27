@@ -105,7 +105,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#203864",
+  themeColor: "#8c3a22",
 };
 
 export default function RootLayout({
@@ -127,7 +127,7 @@ export default function RootLayout({
       <body
         className={`${lexendGiga.variable} ${notoSerifJP.variable} font-sans antialiased bg-mirai-surface-light`}
       >
-        <NextTopLoader showSpinner={false} color="#203864" />
+        <NextTopLoader showSpinner={false} color="#8c3a22" />
         {children}
       </body>
     </html>
