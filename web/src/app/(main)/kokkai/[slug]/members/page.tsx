@@ -7,6 +7,7 @@ import { getBillsByDietSession } from "@/features/bills/server/loaders/get-bills
 import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
 import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
 import { CouncilMemberList } from "@/features/council/client/components/council-member-list";
+import { SeimuKatsudohiSection } from "@/features/council/server/components/seimu-katsudohi-section";
 import { getCouncilMembersBySessionId } from "@/features/council/server/loaders/get-council-members-by-session";
 import { SessionHero } from "@/features/diet-sessions/server/components/session-hero";
 import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
@@ -50,7 +51,10 @@ export default async function DietSessionMembersPage({ params }: Props) {
       <SessionHero label={`${session.name}の議員名簿`} />
 
       <Container className="py-8">
-        <CouncilMemberList session={session} members={members} />
+        <div className="flex flex-col gap-8">
+          <CouncilMemberList session={session} members={members} />
+          <SeimuKatsudohiSection />
+        </div>
       </Container>
 
       {/* パンくずリスト */}

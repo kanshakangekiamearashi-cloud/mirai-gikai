@@ -8,6 +8,7 @@ import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
 import { HomeChatClient } from "@/features/chat/client/components/home-chat-client";
 import { GeneralQuestionList } from "@/features/council/client/components/general-question-list";
 import { getGeneralQuestionsBySessionId } from "@/features/council/server/loaders/get-general-questions-by-session";
+import { getQuestionVideosBySessionId } from "@/features/council/server/loaders/get-question-videos-by-session";
 import { SessionHero } from "@/features/diet-sessions/server/components/session-hero";
 import { getDietSessionBySlug } from "@/features/diet-sessions/server/loaders/get-diet-session-by-slug";
 import { routes } from "@/lib/routes";
@@ -38,8 +39,9 @@ export default async function DietSessionQuestionsPage({ params }: Props) {
     notFound();
   }
 
-  const [questions, bills, currentDifficulty] = await Promise.all([
+  const [questions, videos, bills, currentDifficulty] = await Promise.all([
     getGeneralQuestionsBySessionId(session.id),
+    getQuestionVideosBySessionId(session.id),
     getBillsByDietSession(session.id),
     getDifficultyLevel(),
   ]);
@@ -50,7 +52,11 @@ export default async function DietSessionQuestionsPage({ params }: Props) {
       <SessionHero label={`${session.name}の一般質問`} />
 
       <Container className="py-8">
-        <GeneralQuestionList session={session} questions={questions} />
+        <GeneralQuestionList
+          session={session}
+          questions={questions}
+          videos={videos}
+        />
       </Container>
 
       {/* パンくずリスト */}

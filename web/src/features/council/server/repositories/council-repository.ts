@@ -5,6 +5,7 @@ import type {
   CouncilCommittee,
   CouncilMember,
   CouncilMemberCommittee,
+  CouncilQuestionVideo,
   GeneralQuestion,
 } from "../../shared/types";
 
@@ -24,6 +25,28 @@ export async function findGeneralQuestionsBySessionId(
 
   if (error) {
     console.error("Failed to fetch general questions:", error);
+    return [];
+  }
+
+  return data;
+}
+
+/**
+ * 会期の一般質問・代表質問の公式動画リンクを取得
+ */
+export async function findQuestionVideosBySessionId(
+  sessionId: string
+): Promise<CouncilQuestionVideo[]> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("council_question_videos")
+    .select("*")
+    .eq("diet_session_id", sessionId)
+    .order("asked_on", { ascending: true });
+
+  if (error) {
+    console.error("Failed to fetch question videos:", error);
     return [];
   }
 

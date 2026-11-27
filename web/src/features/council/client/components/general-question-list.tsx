@@ -1,11 +1,14 @@
+import { ExternalLink } from "lucide-react";
 import type { DietSession } from "@/features/diet-sessions/shared/types";
-import type { GeneralQuestion } from "../../shared/types";
+import type { CouncilQuestionVideo, GeneralQuestion } from "../../shared/types";
 import { formatAnswerSourceLabel } from "../../shared/utils/format-answer-source-label";
 import { groupQuestionsBySpeaker } from "../../shared/utils/group-questions-by-speaker";
+import { indexQuestionVideosBySpeakerDate } from "../../shared/utils/index-question-videos";
 
 type Props = {
   session: DietSession;
   questions: GeneralQuestion[];
+  videos?: CouncilQuestionVideo[];
 };
 
 /** YYYY-MM-DD を「M月D日」に整形する（タイムゾーンの影響を受けない） */
@@ -14,8 +17,9 @@ function formatAskedOn(askedOn: string): string {
   return `${Number(month)}月${Number(day)}日`;
 }
 
-export function GeneralQuestionList({ session, questions }: Props) {
+export function GeneralQuestionList({ session, questions, videos }: Props) {
   const groups = groupQuestionsBySpeaker(questions);
+  const videoByKey = indexQuestionVideosBySpeakerDate(videos ?? []);
   const startYear = Number(session.start_date.split("-")[0]);
 
   return (
@@ -27,8 +31,8 @@ export function GeneralQuestionList({ session, questions }: Props) {
         </h1>
         <p className="text-xs font-medium text-mirai-text">
           {groups.length}名・{questions.length}
-          項目（登壇順）。答弁要旨が掲載されている項目は、議会だよりの要旨であり、
-          本会議会議録の逐語ではありません。掲載のない項目は「未確認」と明記しています。
+          項目（登壇順）。答弁要旨が掲載されている項目は、出典（議会だよりの要旨／本会議会議録に基づく要旨）を各項目に明記しています（逐語記録ではありません）。
+          掲載のない項目は「未確認」と明記しています。
         </p>
       </div>
 
@@ -53,6 +57,26 @@ export function GeneralQuestionList({ session, questions }: Props) {
                 {formatAskedOn(group.askedOn)}
               </span>
             </h2>
+            {(() => {
+              const video = videoByKey.get(
+                `${group.speakerName}|${group.askedOn}`
+              );
+              if (!video) return null;
+              return (
+                <p>
+                  <a
+                    href={video.youtube_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={video.video_title}
+                    className="inline-flex items-center gap-1 text-sm font-bold text-primary underline"
+                  >
+                    質問の動画を見る（YouTube・東広島市議会公式）
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </p>
+              );
+            })()}
             <div className="flex flex-col gap-5">
               {group.items.map((item) => (
                 <div key={item.id} className="flex flex-col gap-1.5">

@@ -624,6 +624,47 @@ export type Database = {
           },
         ]
       }
+      council_question_videos: {
+        Row: {
+          asked_on: string
+          created_at: string
+          diet_session_id: string
+          id: string
+          speaker_name: string
+          updated_at: string
+          video_title: string
+          youtube_url: string
+        }
+        Insert: {
+          asked_on: string
+          created_at?: string
+          diet_session_id: string
+          id?: string
+          speaker_name: string
+          updated_at?: string
+          video_title: string
+          youtube_url: string
+        }
+        Update: {
+          asked_on?: string
+          created_at?: string
+          diet_session_id?: string
+          id?: string
+          speaker_name?: string
+          updated_at?: string
+          video_title?: string
+          youtube_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "council_question_videos_diet_session_id_fkey"
+            columns: ["diet_session_id"]
+            isOneToOne: false
+            referencedRelation: "diet_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diet_sessions: {
         Row: {
           created_at: string

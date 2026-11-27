@@ -15,6 +15,17 @@ export type GeneralQuestion = {
   updated_at: string;
 };
 
+export type CouncilQuestionVideo = {
+  id: string;
+  diet_session_id: string;
+  speaker_name: string;
+  asked_on: string;
+  youtube_url: string;
+  video_title: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type CouncilMemberRole = "chair" | "vice_chair" | "member";
 
 export type CouncilMember = {
