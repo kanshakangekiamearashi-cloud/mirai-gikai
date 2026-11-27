@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractBillLead } from "./bill-lead";
+import { extractBillLead, extractBillLeadDetails } from "./bill-lead";
 
 describe("extractBillLead", () => {
   it("コンテンツが無ければ null", () => {
@@ -129,5 +129,39 @@ ${first}`;
     );
     expect(lead).not.toContain("かんじ");
     expect(lead).not.toContain("**");
+  });
+});
+
+describe("extractBillLeadDetails", () => {
+  it("リードを構成する文の列を返す（連結するとリードと一致する）", () => {
+    const content = `## どんな議案ですか
+
+これは、第3次東広島市都市計画マスタープランを改定することを決める議案です。都市計画マスタープランとは、まちづくりの基本的な計画のことです。
+
+改定の主な内容は、令和12年の目標人口を20万2,000人から20万5,000人へ引き上げること、半導体関連企業が集まる吉川地区を「特定機能拠点」に加えること、広島大学周辺地区と吉川地区を「次世代学園都市ゾーン」と位置付けることです。第五次東広島市総合計画の後期基本計画に合わせて見直します。
+`;
+    const details = extractBillLeadDetails(content);
+
+    expect(details?.sentences).toHaveLength(3);
+    expect(details?.sentences.join("")).toBe(details?.lead);
+    expect(details?.sentences[0]).toBe(
+      "これは、第3次東広島市都市計画マスタープランを改定することを決める議案です。"
+    );
+  });
+
+  it("冒頭の文を切り捨てた場合は、文の列は空になる", () => {
+    const first = `${"あ".repeat(100)}、${"い".repeat(150)}。`;
+    const content = `## どんな議案ですか
+
+${first}`;
+    const details = extractBillLeadDetails(content);
+
+    expect(details?.lead.endsWith("…")).toBe(true);
+    expect(details?.sentences).toEqual([]);
+  });
+
+  it("リードが作れない場合は null", () => {
+    expect(extractBillLeadDetails(null)).toBeNull();
+    expect(extractBillLeadDetails("## 案件\n\n議案第1号")).toBeNull();
   });
 });

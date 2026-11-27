@@ -3,7 +3,8 @@ import { getDifficultyLevel } from "@/features/bill-difficulty/server/loaders/ge
 import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
-import { extractBillLead } from "../../shared/utils/bill-lead";
+import { extractBillLeadDetails } from "../../shared/utils/bill-lead";
+import { stripBillLeadDuplication } from "../../shared/utils/bill-lead-strip";
 import { hideUnpublishedStance } from "../../shared/utils/hide-unpublished-stance";
 import {
   findMiraiStanceByBillId,
@@ -45,6 +46,9 @@ const _getCachedBillById = unstable_cache(
     // 選択中の難易度とは別に取得する
     const normalContents = await findNormalContentsByBillIds([id]);
     const normal = normalContents.get(id);
+    const leadDetails = extractBillLeadDetails(normal?.content, {
+      heading: normal?.summary,
+    });
 
     // タグデータを整形
     const tags =
@@ -56,11 +60,23 @@ const _getCachedBillById = unstable_cache(
     return {
       ...bill,
       plain_summary: normal?.summary ?? null,
-      plain_lead: extractBillLead(normal?.content, {
-        heading: normal?.summary,
-      }),
+      plain_lead: leadDetails?.lead ?? null,
       mirai_stance: miraiStance || undefined,
-      bill_content: billContent || undefined,
+      // リード文は「ふつう」本文の冒頭から作るため、表示する本文からは
+      // リードと重なる冒頭の文を取り除く（保存データは書き換えない）。
+      // 「むずかしい」本文は冒頭がリードと一致せず、実際には変わらない。
+      bill_content: billContent
+        ? {
+            ...billContent,
+            content:
+              leadDetails && billContent.content
+                ? stripBillLeadDuplication(
+                    billContent.content,
+                    leadDetails.sentences
+                  )
+                : billContent.content,
+          }
+        : undefined,
       tags,
     };
   },

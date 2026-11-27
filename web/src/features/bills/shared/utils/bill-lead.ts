@@ -23,6 +23,20 @@ const DEFAULT_MAX_LENGTH = 220;
 /** 読点で切る場合に必要とする最低の長さ。短すぎる断片は出さない。 */
 const MIN_PHRASE_LENGTH = 10;
 
+export interface BillLeadDetails {
+  /** リード文そのもの。 */
+  lead: string;
+  /**
+   * リード文を構成する文（プレーンテキスト）の列。詳細ページ側で、
+   * 本文の「## どんな議案ですか」節から同じ文を取り除くために使う
+   * （リードと本文で同じ文が二重に出るのを防ぐ）。
+   *
+   * 冒頭の文が長すぎて読点で切り捨てた場合は、文単位で対応付け
+   * できないため空配列になる（その場合、本文側は取り除きを行わない）。
+   */
+  sentences: string[];
+}
+
 export function extractBillLead(
   content: string | null | undefined,
   options: {
@@ -31,6 +45,17 @@ export function extractBillLead(
     maxLength?: number;
   } = {}
 ): string | null {
+  return extractBillLeadDetails(content, options)?.lead ?? null;
+}
+
+export function extractBillLeadDetails(
+  content: string | null | undefined,
+  options: {
+    heading?: string | null;
+    minLength?: number;
+    maxLength?: number;
+  } = {}
+): BillLeadDetails | null {
   if (!content) {
     return null;
   }
@@ -58,14 +83,18 @@ export function extractBillLead(
   // （文の途中で切らない）。冒頭の文だけで上限を超える場合のみ、
   // 読点の区切りで切って「…」を付ける。
   let lead = "";
+  const leadSentences: string[] = [];
+  let truncated = false;
   for (const sentence of sentences) {
     if (lead.length + sentence.length > maxLength) {
       if (!lead) {
         lead = `${cutAtPhraseBoundary(sentence, maxLength)}…`;
+        truncated = true;
       }
       break;
     }
     lead += sentence;
+    leadSentences.push(sentence);
     if (lead.length >= minLength) {
       break;
     }
@@ -87,7 +116,7 @@ export function extractBillLead(
     }
   }
 
-  return lead;
+  return { lead, sentences: truncated ? [] : leadSentences };
 }
 
 /** 文を上限字数以内の最後の読点で切る。読点が無ければ上限で切る。 */

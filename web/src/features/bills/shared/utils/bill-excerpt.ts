@@ -62,6 +62,21 @@ export function extractBillExcerpt(
 
 /** 「## どんな議案ですか」節の本文（次の ## 見出しまで）を取り出す。 */
 export function extractSection(content: string): string | null {
+  const range = findSectionRange(content);
+  return range ? range.body : null;
+}
+
+/**
+ * 「## どんな議案ですか」節の範囲を返す。
+ *
+ * headingIndex は見出し行の位置、endIndex は次の ## 見出し行の位置
+ * （無ければ行数＝末尾）。body はその間の本文（見出し行を含まない）。
+ */
+export function findSectionRange(content: string): {
+  headingIndex: number;
+  endIndex: number;
+  body: string;
+} | null {
   const lines = content.split("\n");
   const start = lines.findIndex((line) =>
     new RegExp(`^##\\s*${SECTION_TITLE}\\s*$`).test(line)
@@ -70,14 +85,18 @@ export function extractSection(content: string): string | null {
     return null;
   }
 
-  const bodyLines: string[] = [];
-  for (const line of lines.slice(start + 1)) {
-    if (/^##\s/.test(line)) {
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^##\s/.test(lines[i])) {
+      end = i;
       break;
     }
-    bodyLines.push(line);
   }
-  return bodyLines.join("\n");
+  return {
+    headingIndex: start,
+    endIndex: end,
+    body: lines.slice(start + 1, end).join("\n"),
+  };
 }
 
 /** Markdown記法を落とし、段落（空行区切り）のプレーンテキストにする。 */
