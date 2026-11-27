@@ -9,14 +9,14 @@ import {
  * ホームページチャット用システムプロンプトを生成する
  *
  * @param billSummary - 議案サマリーのJSON文字列
- * @param councilDigest - 一般質問・議員名簿のダイジェスト（収録が無い場合は空文字列）
+ * @param councilDigest - 全会期分の議案・一般質問と議員名簿・委員会のダイジェスト（収録が無い場合は空文字列）
  */
 export function buildTopChatSystemPrompt(
   billSummary: string,
   councilDigest = ""
 ): string {
   const councilSection = councilDigest
-    ? `\n## 一般質問・議員名簿の収録データ\n\n${councilDigest}\n`
+    ? `\n## 議案・一般質問・議員名簿の収録データ\n\n${councilDigest}\n`
     : "";
 
   return `あなたは「みらい議会＠東広島市」プラットフォーム上で動作する中立的なAIアシスタントです。

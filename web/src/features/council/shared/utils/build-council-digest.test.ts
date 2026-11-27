@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type {
+  CouncilBillDigestEntry,
   CouncilCommitteeDigestEntry,
   CouncilMember,
+  CouncilSessionDigestData,
   GeneralQuestion,
 } from "../types";
-import { buildCouncilDigest } from "./build-council-digest";
+import {
+  buildCouncilDigest,
+  buildMultiSessionCouncilDigest,
+} from "./build-council-digest";
 
 function makeQuestion(
   overrides: Partial<GeneralQuestion> = {}
@@ -214,10 +219,14 @@ describe("buildCouncilDigest", () => {
   });
 
   it("委員会は seq 順に並べる", () => {
-    const digest = buildCouncilDigest([], [], [
-      makeCommittee({ name: "文教委員会", seq: 2 }),
-      makeCommittee({ name: "総務委員会", seq: 1 }),
-    ]);
+    const digest = buildCouncilDigest(
+      [],
+      [],
+      [
+        makeCommittee({ name: "文教委員会", seq: 2 }),
+        makeCommittee({ name: "総務委員会", seq: 1 }),
+      ]
+    );
 
     expect(digest.indexOf("- 総務委員会")).toBeLessThan(
       digest.indexOf("- 文教委員会")
@@ -225,13 +234,13 @@ describe("buildCouncilDigest", () => {
   });
 
   it("委員長が記録されていない委員会では委員長の断片を省略する", () => {
-    const digest = buildCouncilDigest([], [], [
-      makeCommittee({ chairName: null }),
-    ]);
+    const digest = buildCouncilDigest(
+      [],
+      [],
+      [makeCommittee({ chairName: null })]
+    );
 
-    const line = digest
-      .split("\n")
-      .find((l) => l.startsWith("- 総務委員会"));
+    const line = digest.split("\n").find((l) => l.startsWith("- 総務委員会"));
     expect(line).toBe(
       "- 総務委員会：副委員長 鈴木 花子、委員 田中 一郎、高橋 二郎"
     );
@@ -241,13 +250,13 @@ describe("buildCouncilDigest", () => {
   });
 
   it("副委員長も委員もいない委員会では名前だけの行になる", () => {
-    const digest = buildCouncilDigest([], [], [
-      makeCommittee({ viceChairName: null, memberNames: [] }),
-    ]);
-
-    expect(digest).toContain(
-      "- 総務委員会：委員長 佐藤 太郎"
+    const digest = buildCouncilDigest(
+      [],
+      [],
+      [makeCommittee({ viceChairName: null, memberNames: [] })]
     );
+
+    expect(digest).toContain("- 総務委員会：委員長 佐藤 太郎");
   });
 
   it("委員会が空の場合は委員会セクションを省略する", () => {
@@ -272,5 +281,140 @@ describe("buildCouncilDigest", () => {
     const membersOnly = buildCouncilDigest([], makeSessionMembers());
     expect(membersOnly).toContain("議員名簿");
     expect(membersOnly).not.toContain("一般質問");
+  });
+});
+
+function makeBill(
+  overrides: Partial<CouncilBillDigestEntry> = {}
+): CouncilBillDigestEntry {
+  return {
+    name: "議案第1号 テスト条例の一部改正について",
+    plainHeading: "テスト条例の一部を変える議案",
+    statusLabel: "原案可決",
+    ...overrides,
+  };
+}
+
+function makeSessionData(
+  overrides: Partial<CouncilSessionDigestData> = {}
+): CouncilSessionDigestData {
+  return {
+    sessionName: "令和8年第3回定例会",
+    questions: [],
+    bills: [],
+    ...overrides,
+  };
+}
+
+describe("buildMultiSessionCouncilDigest", () => {
+  it("収録会期を冒頭に示し、会期ごとに見出しで区切って新しい順に並べる", () => {
+    const digest = buildMultiSessionCouncilDigest(
+      [
+        makeSessionData({
+          sessionName: "令和8年第3回定例会",
+          questions: [makeQuestion()],
+        }),
+        makeSessionData({
+          sessionName: "令和8年第2回定例会",
+          questions: [makeQuestion({ id: "q2", topic: "第2回の項目" })],
+        }),
+        makeSessionData({
+          sessionName: "令和8年第1回定例会",
+          questions: [makeQuestion({ id: "q3", topic: "第1回の項目" })],
+        }),
+      ],
+      []
+    );
+
+    expect(digest).toContain(
+      "収録会期：令和8年第3回定例会、令和8年第2回定例会、令和8年第1回定例会（新しい順）"
+    );
+    const third = digest.indexOf("### 令和8年第3回定例会");
+    const second = digest.indexOf("### 令和8年第2回定例会");
+    const first = digest.indexOf("### 令和8年第1回定例会");
+    expect(third).toBeGreaterThanOrEqual(0);
+    expect(second).toBeGreaterThan(third);
+    expect(first).toBeGreaterThan(second);
+    // 会期内の一般質問は小見出しになる
+    expect(digest).toContain("#### 一般質問（質問者1名・全1項目、登壇順）");
+    expect(digest).toContain("第2回の項目");
+    expect(digest).toContain("第1回の項目");
+  });
+
+  it("議案は正式名称・平易な見出し・審議結果を1行で含める", () => {
+    const digest = buildMultiSessionCouncilDigest(
+      [
+        makeSessionData({
+          bills: [
+            makeBill(),
+            makeBill({
+              name: "報告第2号 専決処分の報告について",
+              plainHeading: null,
+              statusLabel: "報告（議決対象外）",
+            }),
+          ],
+        }),
+      ],
+      []
+    );
+
+    expect(digest).toContain("#### 議案（全2件）");
+    expect(digest).toContain(
+      "- 議案第1号 テスト条例の一部改正について｜テスト条例の一部を変える議案｜原案可決"
+    );
+    // 平易な見出しが無い議案は正式名称と審議結果だけの行になる
+    expect(digest).toContain(
+      "- 報告第2号 専決処分の報告について｜報告（議決対象外）"
+    );
+  });
+
+  it("一般質問も議案も無い会期は丸ごと省略する", () => {
+    const digest = buildMultiSessionCouncilDigest(
+      [
+        makeSessionData({
+          sessionName: "令和8年第3回定例会",
+          bills: [makeBill()],
+        }),
+        makeSessionData({ sessionName: "令和8年第2回定例会" }),
+        makeSessionData({
+          sessionName: "令和8年第1回定例会",
+          questions: [makeQuestion()],
+        }),
+      ],
+      []
+    );
+
+    expect(digest).not.toContain("令和8年第2回定例会");
+    expect(digest).toContain(
+      "収録会期：令和8年第3回定例会、令和8年第1回定例会（新しい順）"
+    );
+  });
+
+  it("議員名簿と委員会には対象会期名を併記する", () => {
+    const digest = buildMultiSessionCouncilDigest(
+      [makeSessionData({ questions: [makeQuestion()] })],
+      makeSessionMembers(),
+      [makeCommittee()],
+      "令和8年第3回定例会"
+    );
+
+    expect(digest).toContain("議員名簿（令和8年第3回定例会・全29名）");
+    expect(digest).toContain("委員会（令和8年第3回定例会・全1委員会）");
+    expect(digest).toContain("議長：議員1／副議長：議員8");
+    expect(digest).toContain("- 総務委員会：委員長 佐藤 太郎");
+  });
+
+  it("会期名を渡さなければ議員名簿・委員会は従来の見出しになる", () => {
+    const digest = buildMultiSessionCouncilDigest([], makeSessionMembers(), [
+      makeCommittee(),
+    ]);
+
+    expect(digest).toContain("議員名簿（全29名）");
+    expect(digest).toContain("委員会（全1委員会）");
+  });
+
+  it("すべて空の場合は空文字列を返す", () => {
+    expect(buildMultiSessionCouncilDigest([], [])).toBe("");
+    expect(buildMultiSessionCouncilDigest([makeSessionData()], [])).toBe("");
   });
 });

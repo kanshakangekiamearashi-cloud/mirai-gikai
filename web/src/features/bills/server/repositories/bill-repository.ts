@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@mirai-gikai/supabase";
 import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
+import type { Bill } from "../../shared/types";
 
 // ============================================================
 // Bills
@@ -351,6 +352,39 @@ export async function findPublishedBillsByDietSession(
   // 提出日が全件 null の会期では同ステータス内の並びが不定になるため、
   // 議案番号をタイブレークにした決定的な順序にそろえる。
   return sortByBillListOrder(data);
+}
+
+/** チャット用ダイジェストに必要な議案の最小カラム */
+export type BillDigestRow = Pick<
+  Bill,
+  "id" | "name" | "status" | "status_note" | "submitted_date"
+>;
+
+/**
+ * 会期の公開済み議案を、チャット用ダイジェスト向けに最小カラムで取得する。
+ * 並び順は議案一覧と同じ標準順（sortByBillListOrder）にそろえる。
+ * 取得に失敗した場合は空配列を返す（ダイジェスト側で議案セクションを
+ * 省略するだけで、チャット自体は継続できる）。
+ */
+export async function findPublishedBillDigestRowsByDietSession(
+  dietSessionId: string
+): Promise<BillDigestRow[]> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("bills")
+    .select("id, name, status, status_note, submitted_date")
+    .eq("diet_session_id", dietSessionId)
+    .eq("publish_status", "published")
+    .order("status_order", { ascending: true })
+    .order("submitted_date", { ascending: false, nullsFirst: false });
+
+  if (error) {
+    console.error("Failed to fetch bill digest rows:", error);
+    return [];
+  }
+
+  return sortByBillListOrder(data ?? []);
 }
 
 /**

@@ -63,6 +63,26 @@ export type CouncilCommitteeDigestEntry = {
   memberNames: string[];
 };
 
+/**
+ * チャット用ダイジェストに渡す議案1件分（見出しレベル）。
+ * 正式名称と平易な見出し、審議結果の文言だけを持ち、本文は含めない。
+ */
+export type CouncilBillDigestEntry = {
+  /** 正式名称（「議案第139号 …」のように番号を含む） */
+  name: string;
+  /** 平易な見出し（normal難易度の要約）。収録が無い場合は null */
+  plainHeading: string | null;
+  /** 審議結果・ステータスの表示文言（status_note を優先し、無ければステータスのラベル） */
+  statusLabel: string;
+};
+
+/** チャット用ダイジェストに渡す会期1件分（一般質問と議案見出し） */
+export type CouncilSessionDigestData = {
+  sessionName: string;
+  questions: GeneralQuestion[];
+  bills: CouncilBillDigestEntry[];
+};
+
 /** 議員1名分の委員会所属（委員会名と委員会での役職） */
 export type MemberCommitteeAssignment = {
   name: string;
