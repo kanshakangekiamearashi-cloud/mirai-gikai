@@ -8,7 +8,10 @@ import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/type
 import { InterviewHeaderActions } from "@/features/interview-session/client/components/interview-header-actions";
 import { sendDifficultyStateEvent } from "@/lib/analytics/preference-state-events";
 import { useOnPageView } from "@/lib/analytics/use-on-page-view";
-import { isInterviewPage, isMainPage } from "@/lib/page-layout-utils";
+import {
+  isDifficultySelectorPage,
+  isInterviewPage,
+} from "@/lib/page-layout-utils";
 import { routes } from "@/lib/routes";
 import { HamburgerMenu } from "./hamburger-menu";
 
@@ -18,7 +21,7 @@ interface HeaderClientProps {
 
 export function HeaderClient({ difficultyLevel }: HeaderClientProps) {
   const pathname = usePathname();
-  const showDifficultySelector = isMainPage(pathname);
+  const showDifficultySelector = isDifficultySelectorPage(pathname);
   const showInterviewActions = isInterviewPage(pathname);
 
   // Headerは1ページに1つだけ常時マウントされるため、

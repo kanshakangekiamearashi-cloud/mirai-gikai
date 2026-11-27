@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   extractBillIdFromPath,
+  isDifficultySelectorPage,
   isInterviewPage,
   isInterviewSection,
   isMainPage,
@@ -32,6 +33,40 @@ describe("isMainPage", () => {
   // 末尾スラッシュは Next 側で正規化されるため、素の一致だけを見る。
   it("returns false for the bills list page with a trailing slash", () => {
     expect(isMainPage("/bills/")).toBe(false);
+  });
+});
+
+describe("isDifficultySelectorPage", () => {
+  it("returns true for main pages", () => {
+    expect(isDifficultySelectorPage("/")).toBe(true);
+    expect(isDifficultySelectorPage("/bills")).toBe(true);
+    expect(isDifficultySelectorPage("/bills/abc-123")).toBe(true);
+  });
+
+  it("returns true for council session pages", () => {
+    expect(
+      isDifficultySelectorPage("/kokkai/higashihiroshima-r8-3/bills")
+    ).toBe(true);
+    expect(
+      isDifficultySelectorPage("/kokkai/higashihiroshima-r8-3/questions")
+    ).toBe(true);
+    expect(
+      isDifficultySelectorPage("/kokkai/higashihiroshima-r8-3/members")
+    ).toBe(true);
+  });
+
+  it("returns false for a council path without a known sub-page", () => {
+    expect(isDifficultySelectorPage("/kokkai/higashihiroshima-r8-3")).toBe(
+      false
+    );
+    expect(
+      isDifficultySelectorPage("/kokkai/higashihiroshima-r8-3/unknown")
+    ).toBe(false);
+  });
+
+  it("returns false for unrelated paths", () => {
+    expect(isDifficultySelectorPage("/about")).toBe(false);
+    expect(isDifficultySelectorPage("/bills/abc-123/interview")).toBe(false);
   });
 });
 
