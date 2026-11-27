@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { RubySafeLineClamp } from "@/components/ruby-safe-line-clamp";
 import { Card } from "@/components/ui/card";
 import { formatDateWithDots } from "@/lib/utils/date";
 import type { BillWithContent } from "../../../shared/types";
@@ -18,6 +19,7 @@ interface CompactBillCardProps {
  */
 export function CompactBillCard({ bill, className }: CompactBillCardProps) {
   const displayTitle = bill.bill_content?.title || bill.name;
+  const summary = bill.bill_content?.summary;
   const statusLabel = bill.status === "enacted" ? "成立" : "提出";
 
   return (
@@ -47,6 +49,16 @@ export function CompactBillCard({ bill, className }: CompactBillCardProps) {
               </span>
             )}
           </div>
+          {/* 要約は検索カード（BillSearchCard）と同じ表示にする。
+              bill_content はローダーが難易度で選択済みなので、
+              詳しい表示では hard の要約がそのまま出る。 */}
+          {summary && (
+            <RubySafeLineClamp
+              text={summary}
+              lineClamp={2}
+              className="text-xs leading-relaxed text-mirai-text-secondary"
+            />
+          )}
         </div>
 
         {/* サムネイル画像 */}

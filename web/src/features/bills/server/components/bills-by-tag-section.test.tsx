@@ -73,7 +73,12 @@ describe("BillsByTagSection", () => {
     expect(screen.getByRole("link")).toHaveAttribute("href", "/bills/bill-1");
   });
 
-  // 先頭だけフルカードにするので、要約が出るのは1件目だけになる。
+  /*
+    先頭だけフルカード、2件目以降はコンパクトカードにする。
+    以前はコンパクトカードに要約が無かったため要約の有無で見分けていたが、
+    コンパクトカードも要約を出すようになったので、フルカードだけが出す
+    タグの件数で見分ける（モックのタグは各議案に2つ付いている）。
+  */
   it("2件目以降はコンパクトカードにする", () => {
     render(
       <BillsByTagSection
@@ -86,7 +91,11 @@ describe("BillsByTagSection", () => {
       />
     );
 
+    // 要約はどちらのカードにも出る
     expect(screen.getByText("1件目の法案の要約")).toBeInTheDocument();
-    expect(screen.queryByText("2件目の法案の要約")).not.toBeInTheDocument();
+    expect(screen.getByText("2件目の法案の要約")).toBeInTheDocument();
+    // タグはフルカード（1件目）だけが出すので1件分だけ
+    expect(screen.getAllByText("経済")).toHaveLength(1);
+    expect(screen.getAllByText("環境")).toHaveLength(1);
   });
 });

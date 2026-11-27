@@ -48,6 +48,37 @@ describe("CompactBillCard", () => {
     ).toBeInTheDocument();
   });
 
+  it("要約があればタイトルの下に出す", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          bill_content: createMockBillContent({
+            summary: "福富みらいベースを作るかどうかを決める議案です。",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText("福富みらいベースを作るかどうかを決める議案です。")
+    ).toBeInTheDocument();
+  });
+
+  it("要約が空なら要約の行を出さない", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          bill_content: createMockBillContent({ summary: "" }),
+        })}
+      />
+    );
+
+    // 既定モックの要約文が漏れて出ていないこと
+    expect(
+      screen.queryByText(/この法案は開発プレビュー用のサンプルデータです/)
+    ).not.toBeInTheDocument();
+  });
+
   it("レビュー完了のときだけ完了バッジを添える", () => {
     const { rerender } = render(
       <CompactBillCard bill={createMockBill({ is_review_completed: false })} />

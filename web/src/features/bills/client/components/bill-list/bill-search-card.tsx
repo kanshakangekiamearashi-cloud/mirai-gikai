@@ -15,7 +15,7 @@ import { BillTag } from "./bill-tag";
 /**
  * 法案一覧（/bills）のカード。
  *
- * 既存の BillCard は画像が全幅上部、CompactBillCard は要約とタグを持たないため、
+ * 既存の BillCard は画像が全幅上部、CompactBillCard はタグを持たないため、
  * 一覧のデザイン（右のサムネ＋要約＋タグ）にどちらも合わない。既存のカードには
  * 手を入れず、バッジ・タグ・レビュー済み表示のプリミティブだけを組み合わせる。
  *
