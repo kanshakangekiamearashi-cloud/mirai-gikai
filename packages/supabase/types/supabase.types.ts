@@ -733,6 +733,8 @@ export type Database = {
       }
       general_questions: {
         Row: {
+          answer_detail: string | null
+          answer_detail_source: string | null
           answer_source: string | null
           answer_status: Database["public"]["Enums"]["answer_status_enum"]
           answer_summary: string | null
@@ -747,6 +749,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          answer_detail?: string | null
+          answer_detail_source?: string | null
           answer_source?: string | null
           answer_status: Database["public"]["Enums"]["answer_status_enum"]
           answer_summary?: string | null
@@ -761,6 +765,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          answer_detail?: string | null
+          answer_detail_source?: string | null
           answer_source?: string | null
           answer_status?: Database["public"]["Enums"]["answer_status_enum"]
           answer_summary?: string | null

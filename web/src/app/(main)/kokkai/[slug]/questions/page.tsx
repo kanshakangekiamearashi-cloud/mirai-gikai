@@ -56,6 +56,7 @@ export default async function DietSessionQuestionsPage({ params }: Props) {
           session={session}
           questions={questions}
           videos={videos}
+          difficultyLevel={currentDifficulty}
         />
       </Container>
 

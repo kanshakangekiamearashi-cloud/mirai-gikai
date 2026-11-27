@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { formatAnswerSourceLabel } from "./format-answer-source-label";
+import {
+  formatAnswerDetailLabel,
+  formatAnswerSourceLabel,
+} from "./format-answer-source-label";
 
 describe("formatAnswerSourceLabel", () => {
   it("出典がある場合は出典名つきのラベルにする", () => {
@@ -16,5 +19,17 @@ describe("formatAnswerSourceLabel", () => {
 
   it("出典が無い場合は出典名を補わず、ラベルだけにする", () => {
     expect(formatAnswerSourceLabel(null)).toBe("答弁要旨");
+  });
+});
+
+describe("formatAnswerDetailLabel", () => {
+  it("出典がある場合は出典名つきのラベルにする", () => {
+    expect(formatAnswerDetailLabel("会議録")).toBe(
+      "答弁の詳しい記録（会議録）"
+    );
+  });
+
+  it("出典が無い場合は出典名を補わず、ラベルだけにする", () => {
+    expect(formatAnswerDetailLabel(null)).toBe("答弁の詳しい記録");
   });
 });

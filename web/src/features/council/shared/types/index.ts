@@ -10,6 +10,10 @@ export type GeneralQuestion = {
   topic: string;
   answer_summary: string | null;
   answer_source: string | null;
+  /** 難易度「hard」表示用の詳細な答弁テキスト。無い項目は null（難易度によらず要旨を表示） */
+  answer_detail: string | null;
+  /** answer_detail の出典（例: 会議録、議会だよりvol.213） */
+  answer_detail_source: string | null;
   answer_status: AnswerStatus;
   created_at: string;
   updated_at: string;

@@ -1,14 +1,16 @@
 import { ExternalLink } from "lucide-react";
+import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
 import type { DietSession } from "@/features/diet-sessions/shared/types";
 import type { CouncilQuestionVideo, GeneralQuestion } from "../../shared/types";
-import { formatAnswerSourceLabel } from "../../shared/utils/format-answer-source-label";
 import { groupQuestionsBySpeaker } from "../../shared/utils/group-questions-by-speaker";
 import { indexQuestionVideosBySpeakerDate } from "../../shared/utils/index-question-videos";
+import { selectAnswerText } from "../../shared/utils/select-answer-text";
 
 type Props = {
   session: DietSession;
   questions: GeneralQuestion[];
   videos?: CouncilQuestionVideo[];
+  difficultyLevel: DifficultyLevelEnum;
 };
 
 /** YYYY-MM-DD を「M月D日」に整形する（タイムゾーンの影響を受けない） */
@@ -17,7 +19,12 @@ function formatAskedOn(askedOn: string): string {
   return `${Number(month)}月${Number(day)}日`;
 }
 
-export function GeneralQuestionList({ session, questions, videos }: Props) {
+export function GeneralQuestionList({
+  session,
+  questions,
+  videos,
+  difficultyLevel,
+}: Props) {
   const groups = groupQuestionsBySpeaker(questions);
   const videoByKey = indexQuestionVideosBySpeakerDate(videos ?? []);
   const startYear = Number(session.start_date.split("-")[0]);
@@ -32,7 +39,7 @@ export function GeneralQuestionList({ session, questions, videos }: Props) {
         <p className="text-xs font-medium text-mirai-text">
           {groups.length}名・{questions.length}
           項目（登壇順）。答弁要旨が掲載されている項目は、出典（議会だよりの要旨／本会議会議録に基づく要旨）を各項目に明記しています（逐語記録ではありません）。
-          掲載のない項目は「未確認」と明記しています。
+          掲載のない項目は「未確認」と明記しています。「詳しく」表示では、詳しい記録を収録している項目について、要旨の代わりにそちらを表示します。
         </p>
       </div>
 
@@ -78,28 +85,30 @@ export function GeneralQuestionList({ session, questions, videos }: Props) {
               );
             })()}
             <div className="flex flex-col gap-5">
-              {group.items.map((item) => (
-                <div key={item.id} className="flex flex-col gap-1.5">
-                  <h3 className="text-[15px] font-bold text-black leading-[1.6]">
-                    {item.topic}
-                  </h3>
-                  {item.answer_status === "summary_published" &&
-                  item.answer_summary ? (
-                    <div className="flex flex-col gap-1">
-                      <p className="text-xs font-bold text-primary-accent">
-                        {formatAnswerSourceLabel(item.answer_source)}
+              {group.items.map((item) => {
+                const answer = selectAnswerText(item, difficultyLevel);
+                return (
+                  <div key={item.id} className="flex flex-col gap-1.5">
+                    <h3 className="text-[15px] font-bold text-black leading-[1.6]">
+                      {item.topic}
+                    </h3>
+                    {answer ? (
+                      <div className="flex flex-col gap-1">
+                        <p className="text-xs font-bold text-primary-accent">
+                          {answer.label}
+                        </p>
+                        <p className="text-sm text-mirai-text leading-[1.8] whitespace-pre-wrap">
+                          {answer.text}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-medium text-mirai-text-muted">
+                        答弁要旨は未公表（未確認）
                       </p>
-                      <p className="text-sm text-mirai-text leading-[1.8] whitespace-pre-wrap">
-                        {item.answer_summary}
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="text-sm font-medium text-mirai-text-muted">
-                      答弁要旨は未公表（未確認）
-                    </p>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </section>
         ))

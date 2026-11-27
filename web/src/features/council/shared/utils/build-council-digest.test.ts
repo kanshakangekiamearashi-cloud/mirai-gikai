@@ -23,6 +23,8 @@ function makeQuestion(
     seq: 1,
     topic: "項目1",
     answer_summary: "要旨",
+    answer_detail: null,
+    answer_detail_source: null,
     answer_source: "議会だよりvol.213",
     answer_status: "summary_published",
     created_at: "2026-01-01T00:00:00Z",
