@@ -19,7 +19,7 @@ const base = {
 
 describe("pickHomeSections", () => {
   describe("tagGroups", () => {
-    it("上のセクションに出ていなければそのまま残す", () => {
+    it("タグの議案をそのまま残す", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "a"), group("税金", "b")],
@@ -31,39 +31,41 @@ describe("pickHomeSections", () => {
       ]);
     });
 
-    it("受付中に出した議案をタグ別から外す", () => {
+    it("受付中に出した議案もタグ別に残す", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "a", "b")],
         interviewOpenBills: [bill("b")],
       });
 
-      expect(shape(result.tagGroups)).toEqual([["暮らし", ["a"]]]);
+      expect(shape(result.tagGroups)).toEqual([["暮らし", ["a", "b"]]]);
     });
 
-    it("注目に出した議案をタグ別から外す", () => {
+    it("注目に出した議案もタグ別に残す", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "a", "b")],
         featuredBills: [bill("a")],
       });
 
-      expect(shape(result.tagGroups)).toEqual([["暮らし", ["b"]]]);
-    });
-
-    // 注目セクションを出さない場合は呼び出し側が featuredBills を空にする。
-    // その場合、注目の議案はタグ別から外さず画面に残す。
-    it("featuredBills が空なら注目の議案をタグ別から外さない", () => {
-      const result = pickHomeSections({
-        ...base,
-        billsByTag: [group("暮らし", "a", "b")],
-        featuredBills: [],
-      });
-
       expect(shape(result.tagGroups)).toEqual([["暮らし", ["a", "b"]]]);
     });
 
-    it("同じ議案が複数のタグに付いていれば全てのタグから外す", () => {
+    // 計画タグの唯一の議案が注目に出ても、計画のセクションが消えないこと。
+    it("タグの議案が全て注目と重なってもグループを落とさない", () => {
+      const result = pickHomeSections({
+        ...base,
+        billsByTag: [group("計画", "139"), group("暮らし", "a")],
+        featuredBills: [bill("139")],
+      });
+
+      expect(shape(result.tagGroups)).toEqual([
+        ["計画", ["139"]],
+        ["暮らし", ["a"]],
+      ]);
+    });
+
+    it("受付中に出した議案も、付いている全てのタグに残す", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "a", "x"), group("税金", "x", "b")],
@@ -71,13 +73,13 @@ describe("pickHomeSections", () => {
       });
 
       expect(shape(result.tagGroups)).toEqual([
-        ["暮らし", ["a"]],
-        ["税金", ["b"]],
+        ["暮らし", ["a", "x"]],
+        ["税金", ["x", "b"]],
       ]);
     });
 
-    // 同じカードが別々のタグのセクションに何度も並ぶのを避ける。
-    it("複数のタグに付いた議案は先に並ぶタグにだけ出す", () => {
+    // カテゴリ別セクションはカテゴリごとの一覧なので、重なりはそのまま出す。
+    it("複数のタグに付いた議案は全てのタグに出す", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("司法", "x", "a"), group("組織", "x", "b", "a")],
@@ -85,25 +87,15 @@ describe("pickHomeSections", () => {
 
       expect(shape(result.tagGroups)).toEqual([
         ["司法", ["x", "a"]],
-        ["組織", ["b"]],
+        ["組織", ["x", "b", "a"]],
       ]);
     });
 
-    it("先に並ぶタグに出た議案しか無いタグはグループごと落とす", () => {
-      const result = pickHomeSections({
-        ...base,
-        billsByTag: [group("司法", "x", "a"), group("組織", "a", "x")],
-      });
-
-      expect(shape(result.tagGroups)).toEqual([["司法", ["x", "a"]]]);
-    });
-
     // 見出しだけが残ると、中身が無いカテゴリが並んでしまう。
-    it("全件外れたタグはグループごと落とす", () => {
+    it("議案が1件も無いタグはグループごと落とす", () => {
       const result = pickHomeSections({
         ...base,
-        billsByTag: [group("暮らし", "a"), group("税金", "b", "c")],
-        interviewOpenBills: [bill("b"), bill("c")],
+        billsByTag: [group("暮らし", "a"), group("税金")],
       });
 
       expect(shape(result.tagGroups)).toEqual([["暮らし", ["a"]]]);
@@ -154,8 +146,8 @@ describe("pickHomeSections", () => {
       expect(ids(result.shownBills)).toEqual([]);
     });
 
-    // タグ別から外れた議案を含めると、画面に無いものまでチャットの文脈に入る。
-    it("タグ別から外れた分は重ねて数えない", () => {
+    // タグ別にも同じ議案が出るが、文脈に渡すのは1件だけにする。
+    it("タグ別と受付中で重複する議案は1件にまとめる", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "intv", "other")],

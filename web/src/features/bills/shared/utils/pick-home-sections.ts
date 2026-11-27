@@ -1,9 +1,14 @@
 /**
  * トップページのセクションに何を載せるかを決める。
  *
- * 同じ議案が複数のセクションの条件に当てはまる（受付中かつ注目、など）ので、
- * どこに出してどこから外すかを1箇所に集める。ページ側に散らすと、セクションを
- * 足すたびに除外の条件を書き足すことになり、条件の抜けに気づけない。
+ * タグ別セクションは、そのタグの議案を全て出す。注目やAIインタビュー受付中に
+ * 出ている議案も、複数のタグに付いている議案も外さない。本家（チームみらい）の
+ * トップでも、カテゴリ別セクションにはそのカテゴリの議案が注目と重なっても
+ * 並ぶ。外してしまうと、議案が注目と重なっただけのタグはセクションごと
+ * 消えてしまう（例: 計画タグの議案が注目に出た途端、計画のセクションが無い）。
+ *
+ * 重複を避けるのは、チャットの文脈に渡す shownBills を組み立てるところだけ。
+ * 画面に出ている議案の集合としては1件にまとめる必要があるため。
  */
 
 interface PickHomeSectionsInput<
@@ -20,8 +25,8 @@ interface PickHomeSectionsInput<
 
 interface PickHomeSectionsResult<TBill, TGroup> {
   /**
-   * タグ別セクションに出すグループ。上のセクションや先に並ぶタグに出た議案は
-   * 含まない。
+   * タグ別セクションに出すグループ。各タグの議案を全て含む。議案が1件も
+   * 無いタグは、見出しだけが残るので含まない。
    */
   tagGroups: TGroup[];
   /** 画面に出ている議案を重複なく並べたもの。チャットの文脈に渡す。 */
@@ -46,26 +51,11 @@ export function pickHomeSections<
   const shownFeaturedBills = featuredBills;
   const featuredBillIds = new Set(shownFeaturedBills.map((bill) => bill.id));
 
-  // 受付中と注目に出した議案はタグ別から外す。同じカードが2回並ぶのを避ける。
-  // 受付中と注目の間では外さない。受付中のインタビューは注目の議案に付くことが
-  // 多く、注目から外すとセクションごと空になってしまう。
-  // タグ別の中でも、複数のタグが付いた議案は先に並ぶ（優先度の高い）タグにだけ
-  // 出す。全てのタグに出すと、同じカードが別のセクションに何度も並ぶ。
-  const shownBillIds = new Set([
-    ...interviewOpenBills.map((bill) => bill.id),
-    ...featuredBillIds,
-  ]);
+  // タグ別はタグの議案をそのまま全て出す。他のセクションや先に並ぶタグに
+  // 出た議案も外さない。議案が1件も無いタグだけ落とす。
+  const tagGroups = billsByTag.filter((group) => group.bills.length > 0);
 
-  const tagGroups = billsByTag
-    .map((group) => {
-      const bills = group.bills.filter((bill) => !shownBillIds.has(bill.id));
-      for (const bill of bills) shownBillIds.add(bill.id);
-      return { ...group, bills };
-    })
-    // 出す議案が残らなかったタグは、見出しだけが残るので落とす。
-    .filter((group) => group.bills.length > 0);
-
-  // 受付中と注目は重なるので、IDで一意にする。
+  // 受付中・注目・タグ別は重なるので、IDで一意にする。
   const shownBills = [
     ...new Map(
       [
