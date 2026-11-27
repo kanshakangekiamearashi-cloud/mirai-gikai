@@ -88,7 +88,7 @@ export function BillListWithStatusFilter({ bills }: Props) {
         <div className="flex flex-col gap-3">
           {filteredBills.map((bill) => (
             <Link key={bill.id} href={routes.billDetail(bill.id) as Route}>
-              <CompactBillCard bill={bill} />
+              <CompactBillCard bill={bill} showExcerpt />
             </Link>
           ))}
         </div>

@@ -86,6 +86,14 @@ export function BillCard({ bill }: BillCardProps) {
                   className="text-sm leading-relaxed"
                 />
               )}
+              {/* 説明文の冒頭抜粋（ふつう本文から生成、見出しの言い換えは除く） */}
+              {bill.plain_excerpt && (
+                <RubySafeLineClamp
+                  text={bill.plain_excerpt}
+                  lineClamp={3}
+                  className="text-sm leading-relaxed"
+                />
+              )}
               {/* タグ表示 */}
               {(bill.tags.length > 0 || bill.hasPublicInterview) && (
                 <div className="flex flex-wrap gap-3">

@@ -1,12 +1,15 @@
 import type { BillWithContent } from "../../../shared/types";
-import { findBillPlainSummaries } from "../../repositories/bill-repository";
+import { extractBillExcerpt } from "../../../shared/utils/bill-excerpt";
+import { findNormalContentsByBillIds } from "../../repositories/bill-repository";
 
 /**
- * 議案の配列に「ふつう」（normal）難易度の要約（plain_summary）を一括で付与する
+ * 議案の配列に「ふつう」（normal）難易度の要約（plain_summary）と、
+ * 本文から作る冒頭の抜粋（plain_excerpt）を一括で付与する
  *
  * カードと詳細の見出しは選択中の難易度によらず normal の要約で統一するため、
  * 各ローダーが難易度別のコンテンツとは別にこの要約を付ける。
- * normal の要約が無い議案は null を付与する。
+ * カードに出す説明文の抜粋も、見出しと同じく normal の本文から作る。
+ * normal の行が無い議案はどちらも null を付与する。
  */
 export async function attachPlainSummaries<T extends BillWithContent>(
   bills: T[]
@@ -15,10 +18,18 @@ export async function attachPlainSummaries<T extends BillWithContent>(
     return bills;
   }
 
-  const summaries = await findBillPlainSummaries(bills.map((bill) => bill.id));
+  const contents = await findNormalContentsByBillIds(
+    bills.map((bill) => bill.id)
+  );
 
-  return bills.map((bill) => ({
-    ...bill,
-    plain_summary: summaries.get(bill.id) ?? null,
-  }));
+  return bills.map((bill) => {
+    const normal = contents.get(bill.id);
+    return {
+      ...bill,
+      plain_summary: normal?.summary ?? null,
+      plain_excerpt: extractBillExcerpt(normal?.content, {
+        heading: normal?.summary,
+      }),
+    };
+  });
 }

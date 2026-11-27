@@ -88,6 +88,43 @@ describe("BillCard", () => {
     ).toBeInTheDocument();
   });
 
+  it("説明文の抜粋があれば見出しの下に出す", () => {
+    render(
+      <BillCard
+        bill={createMockBill({
+          plain_summary: "小学校を改修する工事の契約を結ぶ議案",
+          plain_excerpt:
+            "工事は、下黒瀬小学校の校舎を長く使えるように改修する工事です。契約金額は16億473万5,000円で…",
+          bill_content: createMockBillContent({
+            title: "請負契約の締結について",
+            summary: "小学校を改修する工事の契約を結ぶ議案",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText(/契約金額は16億473万5,000円で/)
+    ).toBeInTheDocument();
+  });
+
+  it("説明文の抜粋が無ければ出さない", () => {
+    render(
+      <BillCard
+        bill={createMockBill({
+          plain_summary: "小学校を改修する工事の契約を結ぶ議案",
+          plain_excerpt: null,
+          bill_content: createMockBillContent({
+            title: "請負契約の締結について",
+            summary: "小学校を改修する工事の契約を結ぶ議案",
+          }),
+        })}
+      />
+    );
+
+    expect(screen.queryByText(/契約金額は/)).not.toBeInTheDocument();
+  });
+
   it("注目の議案にだけ注目バッジを出す", () => {
     const { rerender } = render(
       <BillCard bill={createMockBill({ is_featured: false })} />

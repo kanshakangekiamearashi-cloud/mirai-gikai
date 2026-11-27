@@ -60,6 +60,12 @@ export type BillWithContent = Bill & {
    * ローダーが難易度選択とは別に normal の行から付与する。
    */
   plain_summary?: string | null;
+  /**
+   * 「ふつう」本文（「## どんな議案ですか」節）から作る冒頭の抜粋。
+   * カードで見出しの下に出す。言い換えの冒頭文を除いた本文が無い議案では null。
+   * ローダーが plain_summary とあわせて付与する。
+   */
+  plain_excerpt?: string | null;
   mirai_stance?: MiraiStance;
   tags: BillTag[];
   featured_tag?: FeaturedTag;

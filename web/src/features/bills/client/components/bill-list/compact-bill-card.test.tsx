@@ -214,4 +214,33 @@ describe("CompactBillCard", () => {
       })
     ).toBeInTheDocument();
   });
+
+  it("既定では説明文の抜粋を出さない", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          plain_excerpt: "工事は、下黒瀬小学校の校舎を改修する工事です。",
+        })}
+      />
+    );
+
+    expect(
+      screen.queryByText(/下黒瀬小学校の校舎を改修する工事です/)
+    ).not.toBeInTheDocument();
+  });
+
+  it("showExcerpt のときだけ説明文の抜粋を出す", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          plain_excerpt: "工事は、下黒瀬小学校の校舎を改修する工事です。",
+        })}
+        showExcerpt
+      />
+    );
+
+    expect(
+      screen.getByText(/下黒瀬小学校の校舎を改修する工事です/)
+    ).toBeInTheDocument();
+  });
 });

@@ -15,13 +15,23 @@ import { BillStatusBadge } from "./bill-status-badge";
 interface CompactBillCardProps {
   bill: BillWithContent;
   className?: string;
+  /**
+   * 説明文の冒頭抜粋を出すかどうか。
+   * 会期の議案一覧ページでのみ true にする。トップのセクション内など
+   * 他の並びでは出さず、コンパクトな見た目を保つ。
+   */
+  showExcerpt?: boolean;
 }
 
 /**
  * コンパクトな水平レイアウトの法案カード
  * 過去国会セクションや過去国会議案一覧ページで使用
  */
-export function CompactBillCard({ bill, className }: CompactBillCardProps) {
+export function CompactBillCard({
+  bill,
+  className,
+  showExcerpt = false,
+}: CompactBillCardProps) {
   const heading = getBillHeading(bill);
   const subTitle = getBillSubTitle(bill);
   const summary = bill.bill_content?.summary;
@@ -69,6 +79,14 @@ export function CompactBillCard({ bill, className }: CompactBillCardProps) {
               text={summary}
               lineClamp={2}
               className="text-xs leading-relaxed text-mirai-text-secondary"
+            />
+          )}
+          {/* 説明文の冒頭抜粋（会期の議案一覧ページのみ） */}
+          {showExcerpt && bill.plain_excerpt && (
+            <RubySafeLineClamp
+              text={bill.plain_excerpt}
+              lineClamp={2}
+              className="text-xs leading-relaxed"
             />
           )}
         </div>
