@@ -3,10 +3,11 @@ import { getDifficultyLevel } from "@/features/bill-difficulty/server/loaders/ge
 import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/types";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
+import { extractBillLead } from "../../shared/utils/bill-lead";
 import { hideUnpublishedStance } from "../../shared/utils/hide-unpublished-stance";
 import {
-  findBillPlainSummaries,
   findMiraiStanceByBillId,
+  findNormalContentsByBillIds,
   findPublishedBillById,
   findTagsByBillId,
 } from "../repositories/bill-repository";
@@ -40,8 +41,10 @@ const _getCachedBillById = unstable_cache(
       return null;
     }
 
-    // 見出し用の「ふつう」難易度の要約を、選択中の難易度とは別に取得する
-    const plainSummaries = await findBillPlainSummaries([id]);
+    // 見出し用の「ふつう」難易度の要約と、リード文の元になる本文を、
+    // 選択中の難易度とは別に取得する
+    const normalContents = await findNormalContentsByBillIds([id]);
+    const normal = normalContents.get(id);
 
     // タグデータを整形
     const tags =
@@ -52,7 +55,10 @@ const _getCachedBillById = unstable_cache(
 
     return {
       ...bill,
-      plain_summary: plainSummaries.get(id) ?? null,
+      plain_summary: normal?.summary ?? null,
+      plain_lead: extractBillLead(normal?.content, {
+        heading: normal?.summary,
+      }),
       mirai_stance: miraiStance || undefined,
       bill_content: billContent || undefined,
       tags,

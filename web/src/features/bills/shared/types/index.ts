@@ -66,6 +66,13 @@ export type BillWithContent = Bill & {
    * ローダーが plain_summary とあわせて付与する。
    */
   plain_excerpt?: string | null;
+  /**
+   * 「ふつう」本文（「## どんな議案ですか」節）の冒頭から作るリード文。
+   * 詳細ページで見出しの下に出す概要文。言い換えの冒頭文に後続の文を
+   * 足して約150〜220字にしたもの。見出しと重なる議案では null。
+   * ローダーが plain_summary とあわせて付与する。
+   */
+  plain_lead?: string | null;
   mirai_stance?: MiraiStance;
   tags: BillTag[];
   featured_tag?: FeaturedTag;

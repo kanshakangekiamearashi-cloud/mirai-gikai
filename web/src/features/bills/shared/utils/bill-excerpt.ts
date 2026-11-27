@@ -61,7 +61,7 @@ export function extractBillExcerpt(
 }
 
 /** 「## どんな議案ですか」節の本文（次の ## 見出しまで）を取り出す。 */
-function extractSection(content: string): string | null {
+export function extractSection(content: string): string | null {
   const lines = content.split("\n");
   const start = lines.findIndex((line) =>
     new RegExp(`^##\\s*${SECTION_TITLE}\\s*$`).test(line)
@@ -81,7 +81,7 @@ function extractSection(content: string): string | null {
 }
 
 /** Markdown記法を落とし、段落（空行区切り）のプレーンテキストにする。 */
-function toPlainParagraphs(section: string): string[] {
+export function toPlainParagraphs(section: string): string[] {
   const plain = section
     // ルビの読み仮名は落とし、親文字だけ残す
     .replace(/<rt>.*?<\/rt>/g, "")
@@ -110,7 +110,7 @@ function toPlainParagraphs(section: string): string[] {
 }
 
 /** 文（。！？終端）ごとに分割する。区切り文字は各文の末尾に残す。 */
-function splitSentences(text: string): string[] {
+export function splitSentences(text: string): string[] {
   const sentences: string[] = [];
   const pattern = /[^。！？]*[。！？]/g;
   let consumed = 0;
@@ -218,6 +218,6 @@ function cutAtPhraseBoundary(sentence: string, limit: number): string | null {
 }
 
 /** 見出しとの重複判定用に、空白と末尾の句点を落として比べる。 */
-function normalizeForCompare(text: string): string {
+export function normalizeForCompare(text: string): string {
   return text.replace(/\s/g, "").replace(/。$/, "");
 }

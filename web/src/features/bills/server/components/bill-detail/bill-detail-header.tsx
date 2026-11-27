@@ -82,8 +82,17 @@ export async function BillDetailHeader({
       </div>
 
       <div className="px-4 pb-8">
-        {displaySummary && displaySummary !== heading && (
-          <p className="mb-4 leading-relaxed">{displaySummary}</p>
+        {/*
+          リード文（概要文）は本家の型に合わせ、難易度によらず normal 本文の
+          冒頭を出す。無い議案では従来どおり選択中の難易度の要約を出す。
+        */}
+        {bill.plain_lead ? (
+          <p className="mb-4 leading-relaxed">{bill.plain_lead}</p>
+        ) : (
+          displaySummary &&
+          displaySummary !== heading && (
+            <p className="mb-4 leading-relaxed">{displaySummary}</p>
+          )
         )}
 
         {/* タグ表示 */}
