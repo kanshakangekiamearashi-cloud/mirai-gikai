@@ -79,6 +79,50 @@ describe("BillsByTagSection", () => {
     コンパクトカードも要約を出すようになったので、フルカードだけが出す
     タグの件数で見分ける（モックのタグは各議案に2つ付いている）。
   */
+  it("3件を超えるタグは3件だけ出し、もっと見るリンクを出す", () => {
+    render(
+      <BillsByTagSection
+        billsByTag={[
+          group("暮らし", [
+            billNamed("a", "1件目の法案"),
+            billNamed("b", "2件目の法案"),
+            billNamed("c", "3件目の法案"),
+            billNamed("d", "4件目の法案"),
+          ]),
+        ]}
+      />
+    );
+
+    expect(screen.getByText("1件目の法案")).toBeInTheDocument();
+    expect(screen.getByText("3件目の法案")).toBeInTheDocument();
+    expect(screen.queryByText("4件目の法案")).not.toBeInTheDocument();
+
+    const moreLink = screen.getByRole("link", { name: /もっと見る/ });
+    expect(moreLink).toHaveAttribute(
+      "href",
+      "/bills?tag=%E6%9A%AE%E3%82%89%E3%81%97"
+    );
+  });
+
+  it("3件以下のタグは全件出し、もっと見るリンクを出さない", () => {
+    render(
+      <BillsByTagSection
+        billsByTag={[
+          group("暮らし", [
+            billNamed("a", "1件目の法案"),
+            billNamed("b", "2件目の法案"),
+            billNamed("c", "3件目の法案"),
+          ]),
+        ]}
+      />
+    );
+
+    expect(screen.getByText("3件目の法案")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /もっと見る/ })
+    ).not.toBeInTheDocument();
+  });
+
   it("2件目以降はコンパクトカードにする", () => {
     render(
       <BillsByTagSection

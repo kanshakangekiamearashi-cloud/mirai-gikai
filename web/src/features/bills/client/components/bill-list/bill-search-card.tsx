@@ -6,6 +6,10 @@ import { routes } from "@/lib/routes";
 import { formatDateWithDots } from "@/lib/utils/date";
 import type { BillWithContent } from "../../../shared/types";
 import { getArticleReviewState } from "../../../shared/utils/article-review-state";
+import {
+  getBillHeading,
+  getBillSubTitle,
+} from "../../../shared/utils/bill-display";
 import { ReviewCompleteBadge } from "../bill-detail/review-status-banner";
 import { BillPill } from "./bill-pill";
 import { BillProposalTypeBadge } from "./bill-proposal-type-badge";
@@ -27,7 +31,8 @@ import { BillTag } from "./bill-tag";
  * チップが1つずつ折り返して縦に伸びる。
  */
 export function BillSearchCard({ bill }: { bill: BillWithContent }) {
-  const title = bill.bill_content?.title || bill.name;
+  const heading = getBillHeading(bill);
+  const subTitle = getBillSubTitle(bill);
   const summary = bill.bill_content?.summary;
   const reportCount = bill.publicReportCount ?? 0;
   const hasBadges =
@@ -43,7 +48,7 @@ export function BillSearchCard({ bill }: { bill: BillWithContent }) {
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             {/* タイトルは省略しない。何の法案かが読めないと選べない。 */}
             <h3 className="text-base font-bold leading-relaxed">
-              {title}
+              {heading}
               {getArticleReviewState(bill) === "reviewed" && (
                 <>
                   {" "}
@@ -64,7 +69,15 @@ export function BillSearchCard({ bill }: { bill: BillWithContent }) {
               )}
             </div>
 
-            {summary && (
+            {subTitle && (
+              <RubySafeLineClamp
+                text={subTitle}
+                lineClamp={2}
+                className="text-xs leading-relaxed text-mirai-text-secondary"
+              />
+            )}
+
+            {summary && summary !== heading && (
               <RubySafeLineClamp
                 text={summary}
                 lineClamp={2}

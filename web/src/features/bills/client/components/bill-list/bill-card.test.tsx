@@ -9,10 +9,11 @@ import {
 import { BillCard } from "./bill-card";
 
 describe("BillCard", () => {
-  it("タイトルと概要を出す", () => {
+  it("やさしい一文を見出しにし、正式な件名を添えに出す", () => {
     render(
       <BillCard
         bill={createMockBill({
+          plain_summary: "ガソリンにかかる税金を下げる法案です。",
           bill_content: createMockBillContent({
             title: "ガソリン税を安くする法案",
             summary: "ガソリンにかかる税金を下げる法案です。",
@@ -21,9 +22,69 @@ describe("BillCard", () => {
       />
     );
 
-    expect(screen.getByText("ガソリン税を安くする法案")).toBeInTheDocument();
     expect(
       screen.getByText("ガソリンにかかる税金を下げる法案です。")
+    ).toBeInTheDocument();
+    expect(screen.getByText("ガソリン税を安くする法案")).toBeInTheDocument();
+    // ふつうの要約は見出しと同じ文なので、要約として二重に出さない。
+    expect(
+      screen.getAllByText("ガソリンにかかる税金を下げる法案です。")
+    ).toHaveLength(1);
+  });
+
+  it("難しい難易度でも見出しはやさしい一文のまま、審議結果の行も出す", () => {
+    render(
+      <BillCard
+        bill={createMockBill({
+          plain_summary: "ガソリンにかかる税金を下げる法案です。",
+          bill_content: createMockBillContent({
+            title: "ガソリン税を安くする法案",
+            summary: "審議結果：可決しました。",
+            difficulty_level: "hard",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText("ガソリンにかかる税金を下げる法案です。")
+    ).toBeInTheDocument();
+    expect(screen.getByText("ガソリン税を安くする法案")).toBeInTheDocument();
+    expect(screen.getByText("審議結果：可決しました。")).toBeInTheDocument();
+  });
+
+  it("やさしい一文が無ければふつうの要約を見出しにする", () => {
+    render(
+      <BillCard
+        bill={createMockBill({
+          bill_content: createMockBillContent({
+            title: "ガソリン税を安くする法案",
+            summary: "ガソリンにかかる税金を下げる法案です。",
+            difficulty_level: "normal",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText("ガソリンにかかる税金を下げる法案です。")
+    ).toBeInTheDocument();
+    expect(screen.getByText("ガソリン税を安くする法案")).toBeInTheDocument();
+  });
+
+  it("コンテンツが無ければ正式名称を見出しにする", () => {
+    render(
+      <BillCard
+        bill={createMockBill({
+          name: "学校給食法の一部を改正する法律案",
+          bill_content: undefined,
+          is_review_completed: false,
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText("学校給食法の一部を改正する法律案")
     ).toBeInTheDocument();
   });
 

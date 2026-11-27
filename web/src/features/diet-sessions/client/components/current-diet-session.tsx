@@ -17,7 +17,8 @@ type CurrentDietSessionProps = {
  *
  * 会期中は進行バーと残り日数を出す。パーセンテージだけだと寄付の目標額のように
  * 読まれるため、召集日と閉会予定日を併記する。
- * 閉会中はバーを出さず、どの会期が終わったのかをテキストで示す。
+ * 閉会中は、どの会期が終わったのかをテキストで示した上で、100%の進行バーと
+ * 召集日・閉会日を併記する（残り日数は出さない）。
  */
 export function CurrentDietSession({
   session,
@@ -61,7 +62,10 @@ export function CurrentDietSession({
 
         {inSession && <SessionProgressBar session={session} now={now} />}
         {!inSession && closedSession && (
-          <ClosedSessionSummary session={closedSession} />
+          <>
+            <ClosedSessionSummary session={closedSession} />
+            <SessionProgressBar session={closedSession} now={now} closed />
+          </>
         )}
       </div>
     </Container>
@@ -71,9 +75,12 @@ export function CurrentDietSession({
 function SessionProgressBar({
   session,
   now,
+  closed = false,
 }: {
   session: DietSession;
   now: Date;
+  /** 閉会済みの会期向け。残り日数を出さず、閉会日は「閉会」と表記する。 */
+  closed?: boolean;
 }) {
   const { percentage, daysLeft } = calculateSessionProgress(session, now);
 
@@ -83,16 +90,20 @@ function SessionProgressBar({
         <span className="text-[13px] font-bold text-mirai-text-secondary">
           会期の進行
         </span>
-        <span className="flex items-baseline gap-1 whitespace-nowrap">
-          <span className="text-[13px] font-bold text-mirai-text-secondary">
-            閉会まで
+        {!closed && (
+          <span className="flex items-baseline gap-1 whitespace-nowrap">
+            <span className="text-[13px] font-bold text-mirai-text-secondary">
+              閉会まで
+            </span>
+            {/* 残り日数だけ色を変える。会期の進行のうち一番見たい数字。 */}
+            <span className="font-lexend text-[28px] font-bold leading-none text-primary-accent">
+              {daysLeft}
+            </span>
+            <span className="text-[13px] font-bold text-primary-accent">
+              日
+            </span>
           </span>
-          {/* 残り日数だけ色を変える。会期の進行のうち一番見たい数字。 */}
-          <span className="font-lexend text-[28px] font-bold leading-none text-primary-accent">
-            {daysLeft}
-          </span>
-          <span className="text-[13px] font-bold text-primary-accent">日</span>
-        </span>
+        )}
       </div>
 
       {/*
@@ -110,7 +121,7 @@ function SessionProgressBar({
           {formatDateWithDots(session.start_date)} 召集
         </span>
         <span className="whitespace-nowrap">
-          {formatDateWithDots(session.end_date)} 閉会予定
+          {formatDateWithDots(session.end_date)} {closed ? "閉会" : "閉会予定"}
         </span>
       </div>
     </div>

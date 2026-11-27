@@ -12,20 +12,65 @@ import { CompactBillCard } from "./compact-bill-card";
 const DATE_LINE = /^\d{4}\.\d+\.\d+ (提出|成立)$/;
 
 describe("CompactBillCard", () => {
-  it("わかりやすいタイトルがあればそれを見出しにする", () => {
+  it("やさしい一文を見出しにし、正式な件名を添えに出す", () => {
     render(
       <CompactBillCard
         bill={createMockBill({
+          plain_summary: "給食を無償にします。",
           bill_content: createMockBillContent({
             title: "給食を無償にする法案",
+            summary: "給食を無償にします。",
           }),
         })}
       />
     );
 
     expect(
-      screen.getByRole("heading", { name: /給食を無償にする法案/ })
+      screen.getByRole("heading", { name: /給食を無償にします/ })
     ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
+    // ふつうの要約は見出しと同じ文なので、要約として二重に出さない。
+    expect(screen.getAllByText("給食を無償にします。")).toHaveLength(1);
+  });
+
+  it("難しい難易度でも見出しはやさしい一文のまま、審議結果の行も出す", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          plain_summary: "給食を無償にします。",
+          bill_content: createMockBillContent({
+            title: "給食を無償にする法案",
+            summary: "審議結果：可決しました。",
+            difficulty_level: "hard",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /給食を無償にします/ })
+    ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
+    expect(screen.getByText("審議結果：可決しました。")).toBeInTheDocument();
+  });
+
+  it("やさしい一文が無ければふつうの要約を見出しにする", () => {
+    render(
+      <CompactBillCard
+        bill={createMockBill({
+          bill_content: createMockBillContent({
+            title: "給食を無償にする法案",
+            summary: "給食を無償にします。",
+            difficulty_level: "normal",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /給食を無償にします/ })
+    ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
   });
 
   /*
@@ -48,12 +93,14 @@ describe("CompactBillCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("要約があればタイトルの下に出す", () => {
+  it("要約が見出しと違えば見出しの下に出す", () => {
     render(
       <CompactBillCard
         bill={createMockBill({
+          plain_summary: "やさしい見出しです。",
           bill_content: createMockBillContent({
             summary: "福富みらいベースを作るかどうかを決める議案です。",
+            difficulty_level: "hard",
           }),
         })}
       />

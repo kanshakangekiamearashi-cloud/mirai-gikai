@@ -15,7 +15,6 @@ const base = {
   billsByTag: [] as ReturnType<typeof group>[],
   featuredBills: [] as { id: string }[],
   interviewOpenBills: [] as { id: string }[],
-  inSession: true,
 };
 
 describe("pickHomeSections", () => {
@@ -52,13 +51,13 @@ describe("pickHomeSections", () => {
       expect(shape(result.tagGroups)).toEqual([["暮らし", ["b"]]]);
     });
 
-    // 閉会中は注目セクションが出ないので、外すと画面のどこにも出なくなる。
-    it("閉会中は注目の議案をタグ別から外さない", () => {
+    // 注目セクションを出さない場合は呼び出し側が featuredBills を空にする。
+    // その場合、注目の議案はタグ別から外さず画面に残す。
+    it("featuredBills が空なら注目の議案をタグ別から外さない", () => {
       const result = pickHomeSections({
         ...base,
         billsByTag: [group("暮らし", "a", "b")],
-        featuredBills: [bill("a")],
-        inSession: false,
+        featuredBills: [],
       });
 
       expect(shape(result.tagGroups)).toEqual([["暮らし", ["a", "b"]]]);
@@ -146,11 +145,10 @@ describe("pickHomeSections", () => {
       expect(ids(result.shownBills)).toEqual(["both"]);
     });
 
-    it("閉会中は注目だけの議案を含めない", () => {
+    it("featuredBills が空なら注目だけの議案を含めない", () => {
       const result = pickHomeSections({
         ...base,
-        featuredBills: [bill("feat")],
-        inSession: false,
+        featuredBills: [],
       });
 
       expect(ids(result.shownBills)).toEqual([]);
@@ -169,7 +167,7 @@ describe("pickHomeSections", () => {
   });
 
   describe("featuredBillIds", () => {
-    it("会期中は注目の議案IDを返す", () => {
+    it("注目の議案IDを返す", () => {
       const result = pickHomeSections({
         ...base,
         featuredBills: [bill("a"), bill("b")],
@@ -178,11 +176,10 @@ describe("pickHomeSections", () => {
       expect([...result.featuredBillIds]).toEqual(["a", "b"]);
     });
 
-    it("閉会中は空", () => {
+    it("featuredBills が空なら空", () => {
       const result = pickHomeSections({
         ...base,
-        featuredBills: [bill("a")],
-        inSession: false,
+        featuredBills: [],
       });
 
       expect([...result.featuredBillIds]).toEqual([]);

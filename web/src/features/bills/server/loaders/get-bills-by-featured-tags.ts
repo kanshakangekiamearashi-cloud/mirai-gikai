@@ -10,6 +10,7 @@ import {
   findFeaturedTags,
   findPublishedBillsByTag,
 } from "../repositories/bill-repository";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 /**
  * Featured表示用の議案をタグごとにグループ化して取得
@@ -116,11 +117,17 @@ const _getCachedBillsByFeaturedTags = unstable_cache(
     const allBillIds = filteredResults.flatMap((r) => r.bills.map((b) => b.id));
     const interviewBillIds = await findBillIdsWithPublicInterview(allBillIds);
 
+    // 「ふつう」の要約は全グループ横断で一度だけ付与し、IDで配り直す。
+    // 同じ議案が複数タグに現れても、取得は1回で済む。
+    const allBills = filteredResults.flatMap((r) => r.bills);
+    const attachedBills = await attachPlainSummaries(allBills);
+    const attachedById = new Map(attachedBills.map((bill) => [bill.id, bill]));
+
     // インタビュー状態を付与し、タグ内は議案番号順にそろえる
     return filteredResults.map((result) => ({
       ...result,
       bills: sortByBillListOrder(result.bills).map((bill) => ({
-        ...bill,
+        ...(attachedById.get(bill.id) ?? bill),
         hasPublicInterview: interviewBillIds.has(bill.id),
       })),
     }));

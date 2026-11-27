@@ -211,6 +211,74 @@ export async function findBillContentByDifficulty(
   return data;
 }
 
+/**
+ * 複数のbill_idについて、「ふつう」（normal）難易度の要約を一括取得する
+ *
+ * カードと詳細の見出しは選択中の難易度によらず normal の要約で統一するため、
+ * ローダーが選択難易度のコンテンツとは別に付与する（plain_summary）。
+ * 要約が null・空文字の行は結果に含めない。
+ */
+export async function findBillPlainSummaries(
+  billIds: string[]
+): Promise<Map<string, string>> {
+  if (billIds.length === 0) {
+    return new Map();
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("bill_contents")
+    .select("bill_id, summary")
+    .eq("difficulty_level", "normal")
+    .in("bill_id", billIds);
+
+  if (error) {
+    console.error("Failed to fetch bill plain summaries:", error);
+    return new Map();
+  }
+
+  const summaries = new Map<string, string>();
+  for (const row of data ?? []) {
+    if (row.summary) {
+      summaries.set(row.bill_id, row.summary);
+    }
+  }
+
+  return summaries;
+}
+
+/**
+ * 複数のbill_idについて、「ふつう」（normal）難易度のコンテンツを一括取得する
+ *
+ * 賛否の判定など、表示中の難易度によらない本文チェックに使う。
+ */
+export async function findNormalContentsByBillIds(
+  billIds: string[]
+): Promise<Map<string, { summary: string | null; content: string | null }>> {
+  if (billIds.length === 0) {
+    return new Map();
+  }
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("bill_contents")
+    .select("bill_id, summary, content")
+    .eq("difficulty_level", "normal")
+    .in("bill_id", billIds);
+
+  if (error) {
+    console.error("Failed to fetch normal bill contents:", error);
+    return new Map();
+  }
+
+  return new Map(
+    (data ?? []).map((row) => [
+      row.bill_id,
+      { summary: row.summary, content: row.content },
+    ])
+  );
+}
+
 // ============================================================
 // Tags (bulk)
 // ============================================================

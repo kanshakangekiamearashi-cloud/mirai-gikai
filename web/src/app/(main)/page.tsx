@@ -7,11 +7,10 @@ import { BillDisclaimer } from "@/features/bills/client/components/bill-detail/b
 import { BillSearchOverlay } from "@/features/bills/client/components/bill-search-overlay";
 import { BillsByTagSection } from "@/features/bills/server/components/bills-by-tag-section";
 import { CategoryTabs } from "@/features/bills/server/components/category-tabs";
-import { FeaturedBillSection } from "@/features/bills/server/components/featured-bill-section";
 import { InterviewOpenBillSection } from "@/features/bills/server/components/interview-open-bill-section";
-import { PastSessionList } from "@/features/bills/server/components/past-session-list";
-import { PreviousSessionSection } from "@/features/bills/server/components/previous-session-section";
+import { NotableBillSection } from "@/features/bills/server/components/notable-bill-section";
 import { getBillSearchData } from "@/features/bills/server/loaders/get-bill-search-data";
+import { getNotableBills } from "@/features/bills/server/loaders/get-notable-bills";
 import { loadHomeData } from "@/features/bills/server/loaders/load-home-data";
 import type { BillWithContent } from "@/features/bills/shared/types";
 import { chatBillName } from "@/features/bills/shared/utils/chat-bill-name";
@@ -33,14 +32,7 @@ export default async function Home() {
   const japanTime = getJapanTime();
   // ゆくゆくタグ機能がマージされたらBFFに統合する
   const [
-    {
-      billsByTag,
-      featuredBills,
-      interviewOpenBills,
-      comingSoonBills,
-      previousSessionData,
-      pastSessions,
-    },
+    { billsByTag, interviewOpenBills, comingSoonBills },
     currentSession,
     latestClosedSession,
     currentDifficulty,
@@ -53,8 +45,6 @@ export default async function Home() {
     getBillSearchData(),
   ]);
 
-  const inSession = currentSession !== null;
-
   // 会期入口セクションの対象は、開催中の会期→無ければ直近に閉会した会期。
   // slug が無い会期は会期ページへリンクできないので対象にしない。
   const entrySession = currentSession ?? latestClosedSession;
@@ -64,6 +54,11 @@ export default async function Home() {
       ? await getCouncilSessionSummary(entrySession.id, currentDifficulty)
       : null;
 
+  // 注目の議案は入口の会期から取得する（委員会質疑・賛否が分かれた議案）。
+  const notableBills = entrySession
+    ? await getNotableBills(entrySession.id)
+    : [];
+
   // 過去の定例会への入口。入口の会期より前の会期をDBから取得する。
   const pastEntries = entrySession
     ? await getPastCouncilSessionEntries(entrySession, currentDifficulty)
@@ -71,9 +66,8 @@ export default async function Home() {
 
   const { tagGroups, shownBills, featuredBillIds } = pickHomeSections({
     billsByTag,
-    featuredBills,
+    featuredBills: notableBills,
     interviewOpenBills,
-    inSession,
   });
 
   const toBillChatContext = (bill: BillWithContent) => {
@@ -102,16 +96,13 @@ export default async function Home() {
         />
       )}
 
-      {/* 過去の定例会（議案・一般質問）への入口 */}
-      {pastEntries.length > 0 && (
-        <PastCouncilSessionsSection entries={pastEntries} />
-      )}
-
       <Container>
         <div className="pt-4">
           <CategoryTabs
             billsByTag={billsByTag}
-            featuredAnchor={inSession ? FEATURED_ANCHOR : undefined}
+            featuredAnchor={
+              notableBills.length > 0 ? FEATURED_ANCHOR : undefined
+            }
           />
         </div>
         {/* 検索の入口。キーワードとテーマの両方をモーダルに並べる */}
@@ -126,24 +117,18 @@ export default async function Home() {
           <main className="flex flex-col gap-16">
             {/*
               AIインタビュー受付中セクション。意見を出せる法案を最初に見せる。
-              会期では絞らない（閉会中でも受付中なら案内する）ため、注目と違って
-              inSession で出し分けない。
+              会期では絞らない（閉会中でも受付中なら案内する）。
             */}
             <InterviewOpenBillSection bills={interviewOpenBills} />
 
-            {/*
-              注目の法案は会期中だけ出す。閉会中に「注目」を掲げても、審議が
-              動いていない期間の情報を強調することになる。
-              なお getFeaturedBills はアクティブ会期が無いと全件スコープに
-              落ちるので、データ側だけでは空にならない。
-            */}
-            {inSession && (
+            {/* 注目の議案セクション */}
+            {notableBills.length > 0 && (
               <section id={FEATURED_ANCHOR}>
-                <FeaturedBillSection bills={featuredBills} />
+                <NotableBillSection bills={notableBills} />
               </section>
             )}
 
-            {/* タグ別議案一覧セクション（タグに紐づく議案を全件出す） */}
+            {/* タグ別議案一覧セクション */}
             <BillsByTagSection billsByTag={tagGroups} />
 
             {/* Coming soonセクション */}
@@ -152,24 +137,15 @@ export default async function Home() {
         </div>
       </Container>
 
-      {/* 前回の国会セクション（Archive） */}
-      {(previousSessionData || pastSessions.length > 0) && (
-        <div className="bg-mirai-surface-muted py-10">
-          <Container>
-            <div className="flex flex-col gap-10">
-              {previousSessionData && (
-                <PreviousSessionSection
-                  session={previousSessionData.session}
-                  bills={previousSessionData.bills}
-                  totalBillCount={previousSessionData.totalBillCount}
-                />
-              )}
-              <PastSessionList sessions={pastSessions} />
-            </div>
-          </Container>
-        </div>
+      {/* 過去の定例会（議案・一般質問）への入口 */}
+      {pastEntries.length > 0 && (
+        <PastCouncilSessionsSection entries={pastEntries} />
       )}
 
+      {/*
+        本家の Archive（前回会期の議案＋過去の会期一覧）は出さない。
+        過去の定例会セクションと対象が重なり、同じ会期・議案が二重に並ぶため。
+      */}
       <Container>
         {/* みらい議会とは セクション */}
         <About />

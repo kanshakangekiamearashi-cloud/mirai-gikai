@@ -4,10 +4,11 @@ import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/type
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
 import {
+  findBillIdsWithPublicInterview,
   findPublishedBillsByDietSession,
   findTagsByBillIds,
-  findBillIdsWithPublicInterview,
 } from "../repositories/bill-repository";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 /**
  * 国会会期IDに紐づく議案一覧を取得
@@ -52,7 +53,7 @@ const _getCachedBillsByDietSession = unstable_cache(
       };
     });
 
-    return billsWithContent;
+    return attachPlainSummaries(billsWithContent);
   },
   ["bills-by-diet-session"],
   {

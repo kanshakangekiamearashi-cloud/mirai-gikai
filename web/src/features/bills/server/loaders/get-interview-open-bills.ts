@@ -6,6 +6,7 @@ import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/type
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
 import { findBillsWithPublicInterview } from "../repositories/bill-repository";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 /**
  * AIインタビュー受付中の議案を取得する
@@ -32,7 +33,7 @@ const _getCachedInterviewOpenBills = unstable_cache(
   async (difficultyLevel: DifficultyLevelEnum): Promise<BillWithContent[]> => {
     const data = await findBillsWithPublicInterview(difficultyLevel);
 
-    return data.map((item) => {
+    const billsWithContent = data.map((item) => {
       const {
         bill_contents,
         bills_tags,
@@ -54,6 +55,8 @@ const _getCachedInterviewOpenBills = unstable_cache(
       // （content）を引いていない。カードが使うのはタイトルと要約だけなので、
       // ここで返す bill_content の content は参照しないこと。
     }) as BillWithContent[];
+
+    return attachPlainSummaries(billsWithContent);
   },
   ["interview-open-bills-list"],
   {

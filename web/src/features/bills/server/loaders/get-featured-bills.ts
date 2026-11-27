@@ -5,10 +5,11 @@ import { getActiveDietSession } from "@/features/diet-sessions/server/loaders/ge
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
 import {
+  findBillIdsWithPublicInterview,
   findFeaturedBillsWithContents,
   findTagsByBillIds,
-  findBillIdsWithPublicInterview,
 } from "../repositories/bill-repository";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 /**
  * 注目の議案を取得する
@@ -45,7 +46,7 @@ const _getCachedFeaturedBills = unstable_cache(
     ]);
 
     // データ構造を整形
-    return data.map((item) => {
+    const billsWithContent = data.map((item) => {
       const { bill_contents, ...bill } = item;
       return {
         ...bill,
@@ -56,6 +57,8 @@ const _getCachedFeaturedBills = unstable_cache(
         hasPublicInterview: interviewBillIds.has(item.id),
       };
     }) as BillWithContent[];
+
+    return attachPlainSummaries(billsWithContent);
   },
   ["featured-bills-list"],
   {

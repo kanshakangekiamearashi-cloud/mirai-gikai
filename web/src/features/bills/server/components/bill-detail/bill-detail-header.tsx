@@ -16,6 +16,7 @@ import { BillTag } from "../../../client/components/bill-list/bill-tag";
 import { getBillShareData } from "../../../client/utils/share";
 import type { BillWithContent } from "../../../shared/types";
 import { getArticleReviewState } from "../../../shared/utils/article-review-state";
+import { getBillHeading } from "../../../shared/utils/bill-display";
 
 interface BillDetailHeaderProps {
   bill: BillWithContent;
@@ -32,7 +33,9 @@ export async function BillDetailHeader({
   opinionCount,
   topicCount,
 }: BillDetailHeaderProps) {
-  const displayTitle = bill.bill_content?.title;
+  // 見出しは参考サイトの型に合わせ、難易度によらずやさしい一文にする
+  // （正式名称は下の小さなグレーの行に残す）。
+  const heading = getBillHeading(bill);
   const reviewState = getArticleReviewState(bill);
   const displaySummary = bill.bill_content?.summary;
 
@@ -56,17 +59,15 @@ export async function BillDetailHeader({
       )}
 
       <div className="px-4 pt-8 mb-3">
-        {displayTitle && (
-          <h1 className="text-2xl font-bold mb-3">
-            {displayTitle}
-            {reviewState === "reviewed" && (
-              <>
-                {" "}
-                <ReviewCompleteBadge showTooltip />
-              </>
-            )}
-          </h1>
-        )}
+        <h1 className="text-2xl font-bold mb-3">
+          {heading}
+          {reviewState === "reviewed" && (
+            <>
+              {" "}
+              <ReviewCompleteBadge showTooltip />
+            </>
+          )}
+        </h1>
         <div className="flex flex-row gap-4">
           <div className="flex gap-1.5">
             <BillStatusBadge status={bill.status} className="w-fit" />
@@ -81,7 +82,7 @@ export async function BillDetailHeader({
       </div>
 
       <div className="px-4 pb-8">
-        {displaySummary && (
+        {displaySummary && displaySummary !== heading && (
           <p className="mb-4 leading-relaxed">{displaySummary}</p>
         )}
 

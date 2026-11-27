@@ -16,8 +16,6 @@ interface PickHomeSectionsInput<
   featuredBills: readonly TBill[];
   /** AIインタビュー受付中セクションに出す議案。 */
   interviewOpenBills: readonly TBill[];
-  /** 会期中かどうか。閉会中は注目セクションを出さない。 */
-  inSession: boolean;
 }
 
 interface PickHomeSectionsResult<TBill, TGroup> {
@@ -39,13 +37,13 @@ export function pickHomeSections<
   billsByTag,
   featuredBills,
   interviewOpenBills,
-  inSession,
 }: PickHomeSectionsInput<TBill, TGroup>): PickHomeSectionsResult<
   TBill,
   TGroup
 > {
-  // 閉会中は注目セクションを出さないので、注目の議案は画面に出ていない扱いにする。
-  const shownFeaturedBills = inSession ? featuredBills : [];
+  // 注目セクションに出すかどうかは呼び出し側が決める。ここに渡された
+  // featuredBills は常に画面に出ているものとして扱う。
+  const shownFeaturedBills = featuredBills;
   const featuredBillIds = new Set(shownFeaturedBills.map((bill) => bill.id));
 
   // 受付中と注目に出した議案はタグ別から外す。同じカードが2回並ぶのを避ける。

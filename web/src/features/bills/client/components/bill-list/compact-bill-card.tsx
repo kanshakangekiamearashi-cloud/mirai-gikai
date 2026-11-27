@@ -4,6 +4,10 @@ import { Card } from "@/components/ui/card";
 import { formatDateWithDots } from "@/lib/utils/date";
 import type { BillWithContent } from "../../../shared/types";
 import { getArticleReviewState } from "../../../shared/utils/article-review-state";
+import {
+  getBillHeading,
+  getBillSubTitle,
+} from "../../../shared/utils/bill-display";
 import { ReviewCompleteBadge } from "../bill-detail/review-status-banner";
 import { BillProposalTypeBadge } from "./bill-proposal-type-badge";
 import { BillStatusBadge } from "./bill-status-badge";
@@ -18,7 +22,8 @@ interface CompactBillCardProps {
  * 過去国会セクションや過去国会議案一覧ページで使用
  */
 export function CompactBillCard({ bill, className }: CompactBillCardProps) {
-  const displayTitle = bill.bill_content?.title || bill.name;
+  const heading = getBillHeading(bill);
+  const subTitle = getBillSubTitle(bill);
   const summary = bill.bill_content?.summary;
   const statusLabel = bill.status === "enacted" ? "成立" : "提出";
 
@@ -30,7 +35,7 @@ export function CompactBillCard({ bill, className }: CompactBillCardProps) {
         {/* コンテンツエリア */}
         <div className="flex-1 p-4 flex flex-col gap-2">
           <h3 className="font-bold text-[15px] leading-[1.6] line-clamp-2">
-            {displayTitle}
+            {heading}
             {getArticleReviewState(bill) === "reviewed" && (
               <>
                 {" "}
@@ -49,10 +54,17 @@ export function CompactBillCard({ bill, className }: CompactBillCardProps) {
               </span>
             )}
           </div>
-          {/* 要約は検索カード（BillSearchCard）と同じ表示にする。
-              bill_content はローダーが難易度で選択済みなので、
-              詳しい表示では hard の要約がそのまま出る。 */}
-          {summary && (
+          {/* 見出しはやさしい一文、添えに正式な件名を出す。
+              難易度要約は見出しと違うときだけ出す（ふつうでは見出しと
+              同じ文になるため、難しいの「審議結果：…」のときだけ残る）。 */}
+          {subTitle && (
+            <RubySafeLineClamp
+              text={subTitle}
+              lineClamp={2}
+              className="text-xs leading-relaxed text-mirai-text-secondary"
+            />
+          )}
+          {summary && summary !== heading && (
             <RubySafeLineClamp
               text={summary}
               lineClamp={2}

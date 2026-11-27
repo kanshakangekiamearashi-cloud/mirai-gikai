@@ -18,19 +18,86 @@ describe("BillSearchCard", () => {
     );
   });
 
-  // 一覧では何の法案かが読めないと選べないので、タイトルは省略しない。
-  it("長いタイトルも省略せずに出す", () => {
-    const title =
+  // 一覧では何の法案かが読めないと選べないので、見出しは省略しない。
+  it("長い見出しも省略せずに出す", () => {
+    const heading =
       "地方公共団体の議会の議員及び長の選挙に係る公職選挙法の特例に関する法律の一部を改正する法律案";
     render(
       <BillSearchCard
         bill={createMockBill({
-          bill_content: createMockBillContent({ title }),
+          plain_summary: heading,
+          bill_content: createMockBillContent({
+            title: "公職選挙法の特例に関する法律案",
+            summary: heading,
+          }),
         })}
       />
     );
 
-    expect(screen.getByRole("heading")).toHaveTextContent(title);
+    expect(screen.getByRole("heading")).toHaveTextContent(heading);
+    expect(
+      screen.getByText("公職選挙法の特例に関する法律案")
+    ).toBeInTheDocument();
+  });
+
+  it("やさしい一文を見出しにし、正式な件名を添えに出す", () => {
+    render(
+      <BillSearchCard
+        bill={createMockBill({
+          plain_summary: "給食を無償にします。",
+          bill_content: createMockBillContent({
+            title: "給食を無償にする法案",
+            summary: "給食を無償にします。",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /給食を無償にします/ })
+    ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
+    expect(screen.getAllByText("給食を無償にします。")).toHaveLength(1);
+  });
+
+  it("難しい難易度でも見出しはやさしい一文のまま、審議結果の行も出す", () => {
+    render(
+      <BillSearchCard
+        bill={createMockBill({
+          plain_summary: "給食を無償にします。",
+          bill_content: createMockBillContent({
+            title: "給食を無償にする法案",
+            summary: "審議結果：可決しました。",
+            difficulty_level: "hard",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /給食を無償にします/ })
+    ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
+    expect(screen.getByText("審議結果：可決しました。")).toBeInTheDocument();
+  });
+
+  it("やさしい一文が無ければふつうの要約を見出しにする", () => {
+    render(
+      <BillSearchCard
+        bill={createMockBill({
+          bill_content: createMockBillContent({
+            title: "給食を無償にする法案",
+            summary: "給食を無償にします。",
+            difficulty_level: "normal",
+          }),
+        })}
+      />
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /給食を無償にします/ })
+    ).toBeInTheDocument();
+    expect(screen.getByText("給食を無償にする法案")).toBeInTheDocument();
   });
 
   it("タイトルが無ければ正式名称を見出しにする", () => {
@@ -49,11 +116,15 @@ describe("BillSearchCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("概要があれば添え、無ければ何も出さない", () => {
+  it("概要が見出しと違えば添え、無ければ何も出さない", () => {
     const { rerender } = render(
       <BillSearchCard
         bill={createMockBill({
-          bill_content: createMockBillContent({ summary: "税金を下げます。" }),
+          plain_summary: "ガソリン税を安くします。",
+          bill_content: createMockBillContent({
+            summary: "税金を下げます。",
+            difficulty_level: "hard",
+          }),
         })}
       />
     );

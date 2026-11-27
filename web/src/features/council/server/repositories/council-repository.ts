@@ -101,6 +101,31 @@ export async function findCommitteeQaByBillId(
 }
 
 /**
+ * 複数のbill_idのうち、委員会質疑が登録されている議案のIDを一括取得する
+ */
+export async function findBillIdsWithCommitteeQa(
+  billIds: string[]
+): Promise<Set<string>> {
+  if (billIds.length === 0) {
+    return new Set();
+  }
+
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("bill_committee_qa")
+    .select("bill_id")
+    .in("bill_id", billIds);
+
+  if (error) {
+    console.error("Failed to fetch bill ids with committee Q&A:", error);
+    return new Set();
+  }
+
+  return new Set((data ?? []).map((row) => row.bill_id));
+}
+
+/**
  * 会期の議員名簿を掲載順に取得
  */
 export async function findCouncilMembersBySessionId(

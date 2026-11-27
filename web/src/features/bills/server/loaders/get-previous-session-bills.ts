@@ -11,6 +11,7 @@ import {
   findTagsByBillIds,
 } from "../repositories/bill-repository";
 import { getPublishedBillCount } from "./get-published-bill-count";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 const MAX_PREVIEW_BILLS = 5;
 
@@ -77,7 +78,7 @@ const _getCachedPreviousSessionBills = unstable_cache(
       };
     });
 
-    return billsWithContent;
+    return attachPlainSummaries(billsWithContent);
   },
   ["previous-session-bills"],
   {

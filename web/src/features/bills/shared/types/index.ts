@@ -54,6 +54,12 @@ export type FeaturedTag = {
 
 export type BillWithContent = Bill & {
   bill_content?: BillContent;
+  /**
+   * 「ふつう」（normal）難易度の要約文。カードと詳細の見出しは難易度によらず
+   * この一文で統一する。「難しい」の要約は「審議結果：…」で見出しにできない。
+   * ローダーが難易度選択とは別に normal の行から付与する。
+   */
+  plain_summary?: string | null;
   mirai_stance?: MiraiStance;
   tags: BillTag[];
   featured_tag?: FeaturedTag;

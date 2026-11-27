@@ -4,6 +4,10 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateWithDots } from "@/lib/utils/date";
 import type { BillWithContent } from "../../../shared/types";
 import { getArticleReviewState } from "../../../shared/utils/article-review-state";
+import {
+  getBillHeading,
+  getBillSubTitle,
+} from "../../../shared/utils/bill-display";
 import { ReviewCompleteBadge } from "../bill-detail/review-status-banner";
 import { BillProposalTypeBadge } from "./bill-proposal-type-badge";
 import { BillStatusBadge } from "./bill-status-badge";
@@ -14,7 +18,8 @@ interface BillCardProps {
 }
 
 export function BillCard({ bill }: BillCardProps) {
-  const displayTitle = bill.bill_content?.title;
+  const heading = getBillHeading(bill);
+  const subTitle = getBillSubTitle(bill);
   const summary = bill.bill_content?.summary;
 
   return (
@@ -49,7 +54,7 @@ export function BillCard({ bill }: BillCardProps) {
           <CardHeader>
             <div className="flex flex-col gap-3">
               <CardTitle className="text-2xl/8 tracking-normal">
-                {displayTitle}
+                {heading}
                 {getArticleReviewState(bill) === "reviewed" && (
                   <>
                     {" "}
@@ -57,6 +62,11 @@ export function BillCard({ bill }: BillCardProps) {
                   </>
                 )}
               </CardTitle>
+              {subTitle && (
+                <p className="text-sm text-muted-foreground font-medium">
+                  {subTitle}
+                </p>
+              )}
               <div className="flex flex-row gap-4">
                 <div className="flex gap-1.5">
                   <BillStatusBadge status={bill.status} className="w-fit" />
@@ -68,12 +78,14 @@ export function BillCard({ bill }: BillCardProps) {
                   )}
                 </div>
               </div>
-              <RubySafeLineClamp
-                text={summary}
-                maxLength={132}
-                lineClamp={4}
-                className="text-sm leading-relaxed"
-              />
+              {summary && summary !== heading && (
+                <RubySafeLineClamp
+                  text={summary}
+                  maxLength={132}
+                  lineClamp={4}
+                  className="text-sm leading-relaxed"
+                />
+              )}
               {/* タグ表示 */}
               {(bill.tags.length > 0 || bill.hasPublicInterview) && (
                 <div className="flex flex-wrap gap-3">

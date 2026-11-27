@@ -5,6 +5,7 @@ import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
 import { hideUnpublishedStance } from "../../shared/utils/hide-unpublished-stance";
 import {
+  findBillPlainSummaries,
   findMiraiStanceByBillId,
   findPublishedBillById,
   findTagsByBillId,
@@ -39,6 +40,9 @@ const _getCachedBillById = unstable_cache(
       return null;
     }
 
+    // 見出し用の「ふつう」難易度の要約を、選択中の難易度とは別に取得する
+    const plainSummaries = await findBillPlainSummaries([id]);
+
     // タグデータを整形
     const tags =
       billTags
@@ -48,6 +52,7 @@ const _getCachedBillById = unstable_cache(
 
     return {
       ...bill,
+      plain_summary: plainSummaries.get(id) ?? null,
       mirai_stance: miraiStance || undefined,
       bill_content: billContent || undefined,
       tags,

@@ -4,10 +4,11 @@ import type { DifficultyLevelEnum } from "@/features/bill-difficulty/shared/type
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import type { BillWithContent } from "../../shared/types";
 import {
+  findBillIdsWithPublicInterview,
   findPublishedBillsWithContents,
   findTagsByBillIds,
-  findBillIdsWithPublicInterview,
 } from "../repositories/bill-repository";
+import { attachPlainSummaries } from "./helpers/attach-plain-summaries";
 
 export async function getBills(): Promise<BillWithContent[]> {
   // キャッシュ外でcookiesにアクセス
@@ -38,7 +39,7 @@ const _getCachedBills = unstable_cache(
       };
     });
 
-    return billsWithContent;
+    return attachPlainSummaries(billsWithContent);
   },
   ["bills-list"],
   {
